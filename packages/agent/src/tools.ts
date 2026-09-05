@@ -45,6 +45,8 @@ export async function runTool(tools: AgentTool[], name: string, rawArgs: string)
 }
 
 const pretty = (v: unknown) => JSON.stringify(v, null, 1);
+
+/** Every paid tool result starts with a PAYMENT line so the model can cite the Hedera settlement id. */
 const paymentLine = (p: Payment | null) =>
   p ? `PAYMENT: ${p.hbar} HBAR settled on Hedera, settlement id ${p.settlementTx} (${p.hashscan})\n` : "PAYMENT: none (free or cancelled)\n";
 
