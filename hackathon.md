@@ -168,6 +168,14 @@ Common reqs: bazantic.com account; create an x402/MPP Gateway for your project; 
 
 ---
 
+## 7a. Build status (2026-09-05)
+
+Project name: **Rug Radar**. Code is in this repo (pnpm workspace: `packages/shared`, `service`, `agent`, `ens`); see `README.md` for architecture, pricing, quickstart and the demo script.
+
+Verified without credentials: typecheck clean; service boots against the live Blocky402 testnet facilitator and returns correct metered `402` quotes (HBAR + USDC, facilitator feePayer merged); agent budget guard blocks over-budget quotes before signing; ENSv2 Sepolia addresses have bytecode, `rugradar.eth` is available (8 MockUSDC/yr, 60 s commitment age), Universal Resolver resolution works through viem; Substreams request builds against `ethereum-common`; GraphQL fields validated against Messari schemas 1.3 / 4.0 / lending 3.1.
+
+Needs your keys to finish: `GRAPH_API_KEY` (run `pnpm graph:smoke`), two Hedera testnet ECDSA accounts (`pnpm hedera:topics`, then a funded paid call), `LLM_BASE_URL` / `LLM_API_KEY` / `LLM_MODEL` for an OpenAI-compatible Qwen 3.8 endpoint (agent run), Sepolia key with ETH (`pnpm ens:deploy`, `pnpm ens:register api …`), optional `SUBSTREAMS_API_TOKEN` for the live wire.
+
 ## 7. Idea shortlist (15) and revised pick
 
 | # | Idea | Bounties (3) | Slots | Effort | Demo |

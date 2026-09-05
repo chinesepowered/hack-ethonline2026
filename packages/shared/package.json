@@ -1,0 +1,17 @@
+{
+  "name": "@rugradar/shared",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "smoke": "tsx scripts/smoke.ts"
+  },
+  "dependencies": {
+    "@hiero-ledger/sdk": "2.87.0",
+    "dotenv": "17.4.2",
+    "viem": "2.56.3"
+  }
+}

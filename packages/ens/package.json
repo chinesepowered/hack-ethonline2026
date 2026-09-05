@@ -1,0 +1,17 @@
+{
+  "name": "@rugradar/ens",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "deploy-namespace": "tsx src/deploy-namespace.ts",
+    "register-service": "tsx src/register-service.ts",
+    "revoke-service": "tsx src/revoke-service.ts",
+    "resolve": "tsx src/resolve.ts",
+    "list": "tsx src/list.ts"
+  },
+  "dependencies": {
+    "@rugradar/shared": "workspace:*",
+    "viem": "2.56.3"
+  }
+}

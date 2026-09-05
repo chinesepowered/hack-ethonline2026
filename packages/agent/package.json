@@ -1,0 +1,19 @@
+{
+  "name": "@rugradar/agent",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/index.ts",
+    "curl": "tsx scripts/curl.ts"
+  },
+  "dependencies": {
+    "@rugradar/shared": "workspace:*",
+    "@x402/core": "2.25.0",
+    "@x402/fetch": "2.25.0",
+    "@x402/hedera": "2.25.0",
+    "openai": "7.10.0",
+    "viem": "2.56.3",
+    "zod": "4.5.4"
+  }
+}

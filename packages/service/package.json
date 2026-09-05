@@ -1,0 +1,29 @@
+{
+  "name": "@rugradar/service",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx src/server.ts",
+    "start": "tsx src/server.ts",
+    "create-topics": "tsx scripts/create-topics.ts",
+    "create-agent-account": "tsx scripts/create-agent-account.ts",
+    "associate-usdc": "tsx scripts/associate-usdc.ts"
+  },
+  "dependencies": {
+    "@hiero-ledger/sdk": "2.87.0",
+    "@rugradar/shared": "workspace:*",
+    "@substreams/core": "0.17.0",
+    "@substreams/manifest": "0.16.0",
+    "@substreams/node": "0.7.2",
+    "@x402/core": "2.25.0",
+    "@x402/express": "2.25.0",
+    "@x402/hedera": "2.25.0",
+    "@x402/paywall": "2.25.0",
+    "express": "5.2.1",
+    "viem": "2.56.3"
+  },
+  "devDependencies": {
+    "@types/express": "5.0.6"
+  }
+}

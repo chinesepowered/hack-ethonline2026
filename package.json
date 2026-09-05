@@ -1,0 +1,31 @@
+{
+  "name": "rug-radar",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Rug Radar — x402-metered DeFi drain & whale intelligence on Hedera, powered by The Graph standardized subgraphs + Substreams, discoverable via ENSv2.",
+  "type": "module",
+  "packageManager": "pnpm@11.22.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "service": "pnpm --filter @rugradar/service dev",
+    "agent": "pnpm --filter @rugradar/agent start --",
+    "ens:deploy": "pnpm --filter @rugradar/ens deploy-namespace",
+    "ens:register": "pnpm --filter @rugradar/ens register-service --",
+    "ens:resolve": "pnpm --filter @rugradar/ens resolve --",
+    "ens:list": "pnpm --filter @rugradar/ens list",
+    "ens:revoke": "pnpm --filter @rugradar/ens revoke-service --",
+    "hedera:topics": "pnpm --filter @rugradar/service create-topics",
+    "hedera:agent-account": "pnpm --filter @rugradar/service create-agent-account",
+    "hedera:associate-usdc": "pnpm --filter @rugradar/service associate-usdc",
+    "graph:smoke": "pnpm --filter @rugradar/shared smoke",
+    "demo:curl": "pnpm --filter @rugradar/agent curl --"
+  },
+  "devDependencies": {
+    "@types/node": "26.4.1",
+    "tsx": "4.23.13",
+    "typescript": "7.0.2"
+  }
+}
