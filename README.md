@@ -94,7 +94,7 @@ Prices are computed per request (x402 dynamic pricing), so a two-protocol scan a
 
 ## Quickstart
 
-Requirements: Node ≥ 22, pnpm 11, a Hedera testnet ECDSA account pair (agent + service) from https://portal.hedera.com, a Subgraph Studio API key, an OpenAI-compatible LLM endpoint (`LLM_BASE_URL`, `LLM_API_KEY`, `LLM_MODEL`; we use Qwen 3.8), and a Sepolia key with a little ETH for the ENS steps.
+Requirements: Node ≥ 22, pnpm 11, one funded Hedera testnet account from https://portal.hedera.com (ECDSA or ED25519; set `HEDERA_SERVICE_KEY_TYPE`), a Subgraph Studio API key, an OpenAI-compatible LLM endpoint (`LLM_BASE_URL`, `LLM_API_KEY`, `LLM_MODEL`; we use Qwen 3.8), and a Sepolia key with a little ETH for the ENS steps.
 
 ```bash
 pnpm install
@@ -103,7 +103,8 @@ cp .env.example .env        # fill in keys (see comments)
 # 0. sanity: the same query across every protocol
 pnpm graph:smoke
 
-# 1. Hedera: audit topics (+ optional USDC association)
+# 1. Hedera: a separate agent wallet (x402 needs payer ≠ payee), audit topics, optional USDC
+pnpm hedera:agent-account    # creates a funded ECDSA account; paste HEDERA_AGENT_* into .env
 pnpm hedera:topics           # paste HCS_SERVICE_TOPIC_ID / HCS_AGENT_TOPIC_ID into .env
 pnpm hedera:associate-usdc   # optional; HBAR needs no association
 

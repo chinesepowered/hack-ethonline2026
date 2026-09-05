@@ -1,0 +1,12 @@
+{
+  "parentLabel": "rugradar",
+  "parentName": "rugradar.eth",
+  "userRegistry": "0x8ff7afe6ad9ED3D06caDFD487fdf059c1938Aa36",
+  "resolver": "0x132145725Cf0553E226B9e83C461C5F42250E0Ee",
+  "deployBlock": 11637482,
+  "admin": "0x6Bd07000C5F746af69BEe7f151eb30285a6678B2",
+  "chainId": 11155111,
+  "ethRegistry": "0xbdc85dd5b15d7ecb354cd7cb6f2c50b4f2c4f0e2",
+  "universalResolver": "0xeEeEEEeE14D718C2B47D9923Deab1335E144EeEe",
+  "deployedAt": "2026-09-05T02:32:13.978Z"
+}

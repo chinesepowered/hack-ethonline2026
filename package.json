@@ -17,6 +17,7 @@
     "ens:resolve": "pnpm --filter @rugradar/ens resolve --",
     "ens:list": "pnpm --filter @rugradar/ens list",
     "ens:revoke": "pnpm --filter @rugradar/ens revoke-service --",
+    "ens:service-update": "pnpm --filter @rugradar/ens service-update --",
     "hedera:topics": "pnpm --filter @rugradar/service create-topics",
     "hedera:agent-account": "pnpm --filter @rugradar/service create-agent-account",
     "hedera:associate-usdc": "pnpm --filter @rugradar/service associate-usdc",

@@ -40,6 +40,10 @@ export async function whales(req: Request, res: Response): Promise<void> {
       return [];
     });
     events.sort((a, b) => b.amountUsd - a.amountUsd);
+    if (Object.keys(perProtocolErrors).length === protocols.length) {
+      // Every upstream query failed: fail the request so the x402 payment is cancelled, never charge for nothing.
+      return fail(res, 502, `all ${protocols.length} protocol queries failed: ${Object.values(perProtocolErrors)[0]}`);
+    }
     const body: WhalesResponse = {
       generatedAt: new Date().toISOString(),
       source: "the-graph:messari-standardized-subgraphs",

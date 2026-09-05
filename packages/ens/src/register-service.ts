@@ -44,7 +44,12 @@ const days = Number(arg("days") ?? 30);
 const isAgent = flag("agent");
 const url = (arg("url") ?? envOptional("SERVICE_URL") ?? "http://localhost:4021").replace(/\/$/, "");
 
-const rawKey = arg("service-key") ?? envOptional("HEDERA_SERVICE_PRIVATE_KEY");
+// The service's EVM identity for ENS (record ownership + EAC delegation). An ED25519 Hedera key
+// is not a secp256k1 key, so prefer a dedicated ENS_SERVICE_EVM_PRIVATE_KEY.
+const rawKey =
+  arg("service-key") ??
+  envOptional("ENS_SERVICE_EVM_PRIVATE_KEY") ??
+  ((envOptional("HEDERA_SERVICE_KEY_TYPE") ?? "ecdsa") === "ecdsa" ? envOptional("HEDERA_SERVICE_PRIVATE_KEY") : undefined);
 const serviceAddress: Address | undefined = rawKey ? (isAddress(rawKey) ? (rawKey as Address) : privateKeyToAddress(rawKey as Hex)) : undefined;
 const network = `hedera:${envOptional("HEDERA_NETWORK") ?? "testnet"}`;
 const payTo = envOptional("HEDERA_SERVICE_ACCOUNT_ID") ?? "";
