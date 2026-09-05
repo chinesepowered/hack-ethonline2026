@@ -12,7 +12,7 @@ import { env, hashscanTopic, hashscanTx } from "@rugradar/shared";
 import { buildTools, runTool, toOpenAITools, type AgentContext } from "./tools.ts";
 import { createPayingFetch } from "./x402.ts";
 
-const question = process.argv.slice(2).join(" ").trim() || "Which DEX pools show drain risk in the last 24 hours, and is anything unusual happening right now?";
+const question = process.argv.slice(2).filter((a) => a !== "--").join(" ").trim() || "Which DEX pools show drain risk in the last 24 hours, and is anything unusual happening right now?";
 const MAX_ITERATIONS = 16;
 
 const SYSTEM = `You are Rug Radar, an autonomous DeFi risk analyst with your own Hedera wallet.
@@ -95,6 +95,7 @@ async function main() {
     verdict: text.split("\n").find((l) => l.toLowerCase().includes("verdict"))?.slice(0, 280) ?? text.slice(0, 280),
   });
   if (decisionTx) console.log(`\n🧾 Decision anchored on HCS: ${hashscanTx(decisionTx)}`);
+  process.exit(0); // Hedera SDK keeps gRPC channels open; exit explicitly
 }
 
 main().catch((err) => {

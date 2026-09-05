@@ -9,7 +9,7 @@
     "revoke-service": "tsx src/revoke-service.ts",
     "service-update": "tsx src/service-update.ts",
     "resolve": "tsx src/resolve.ts",
-    "list": "tsx src/list.ts"
+    "list-names": "tsx src/list.ts"
   },
   "dependencies": {
     "@rugradar/shared": "workspace:*",

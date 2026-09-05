@@ -9,7 +9,7 @@ import { resolveRecords } from "../src/discovery.ts";
 import { createPayingFetch, describe402 } from "../src/x402.ts";
 
 // Git Bash on Windows rewrites a leading "/v1/..." into a filesystem path; recover the API path.
-const rawPath = process.argv[2] ?? "/v1/catalog";
+const rawPath = process.argv.filter((a) => a !== "--")[2] ?? "/v1/catalog";
 const path = "/" + rawPath.replace(/^.*?(?=\/?(v1|\.well-known|health)\b)/, "").replace(/^\/+/, "");
 let base = envOptional("SERVICE_URL_OVERRIDE");
 if (!base) {
@@ -35,3 +35,4 @@ if (payment) {
 }
 const text = await res.text();
 console.log(text.length > 4000 ? text.slice(0, 4000) + "\n…" : text);
+process.exit(0);

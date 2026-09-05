@@ -6,7 +6,7 @@
 import { labelId, loadEnsDeployment, userRegistryAbi } from "@rugradar/shared";
 import { admin, sendAndWait } from "./clients.ts";
 
-const label = process.argv[2];
+const label = process.argv.filter((a) => a !== "--")[2];
 if (!label) throw new Error("usage: pnpm ens:revoke <label>");
 const deployment = loadEnsDeployment();
 if (!deployment) throw new Error("No namespace yet — run pnpm ens:deploy first");

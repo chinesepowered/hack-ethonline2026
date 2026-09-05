@@ -2,7 +2,7 @@ import { z } from "zod";
 import type OpenAI from "openai";
 import { DEX_PROTOCOLS, LENDING_PROTOCOLS } from "@rugradar/shared";
 import { discoverServices, type DiscoveredService } from "./discovery.ts";
-import { BudgetExceeded, describe402, type PayingFetch } from "./x402.ts";
+import { BudgetExceeded, describe402, type Payment, type PayingFetch } from "./x402.ts";
 
 export interface AgentContext {
   pay: PayingFetch;
@@ -45,6 +45,8 @@ export async function runTool(tools: AgentTool[], name: string, rawArgs: string)
 }
 
 const pretty = (v: unknown) => JSON.stringify(v, null, 1);
+const paymentLine = (p: Payment | null) =>
+  p ? `PAYMENT: ${p.hbar} HBAR settled on Hedera, settlement id ${p.settlementTx} (${p.hashscan})\n` : "PAYMENT: none (free or cancelled)\n";
 
 function serviceBase(ctx: AgentContext, name?: string): string {
   const svc = name ? ctx.services.find((s) => s.name === name) : ctx.services[0];
@@ -61,7 +63,7 @@ async function paidJson(ctx: AgentContext, url: string): Promise<string> {
     if (!res.ok) return `HTTP ${res.status}: ${text.slice(0, 500)}`;
     if (payment) ctx.log(`  paid ${payment.hbar} HBAR · settlement ${payment.settlementTx}${payment.auditTx ? ` · HCS ${payment.auditTx}` : ""}`);
     else ctx.log("  (no payment header — free route or cached)");
-    return text;
+    return `${paymentLine(payment)}${text}`;
   } catch (err) {
     if (err instanceof BudgetExceeded) {
       ctx.log(`  ✗ ${err.message}`);
@@ -203,7 +205,7 @@ export function buildTools(ctx: AgentContext): AgentTool[] {
             }
           }
         }
-        return pretty({ window: meta, observed: events.length, events: events.slice(0, 40) });
+        return `${paymentLine(payment)}${pretty({ window: meta, observed: events.length, events: events.slice(0, 40) })}`;
       } catch (err) {
         if (err instanceof BudgetExceeded) return `BUDGET_EXCEEDED: ${err.message}`;
         throw err;

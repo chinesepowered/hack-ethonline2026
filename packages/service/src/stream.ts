@@ -15,6 +15,11 @@ const seen = new Set<string>();
 export async function streamWhales(req: Request, res: Response): Promise<void> {
   const seconds = Math.min(PRICING.streamMaxSeconds, Math.max(15, Number(req.query.seconds ?? 15)));
   const minUsd = Number(req.query.minUsd ?? envOptional("STREAM_MIN_USD") ?? 1_000_000);
+  if (whaleWire.status.mode !== "substreams" && !envOptional("GRAPH_API_KEY")) {
+    // No live source configured: fail before streaming so the x402 payment is cancelled.
+    res.status(503).json({ error: "whale wire unavailable: set SUBSTREAMS_API_TOKEN or GRAPH_API_KEY" });
+    return;
+  }
 
   res.setHeader("Content-Type", "text/event-stream; charset=utf-8");
   res.setHeader("Cache-Control", "no-cache");

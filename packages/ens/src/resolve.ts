@@ -8,7 +8,7 @@ import { normalize } from "viem/ens";
 import { ENSV2_SEPOLIA, SERVICE_RECORD_KEYS, ethRegistryAbi, labelId, loadEnsDeployment, userRegistryAbi } from "@rugradar/shared";
 import { publicClient } from "./clients.ts";
 
-const name = process.argv[2];
+const name = process.argv.filter((a) => a !== "--")[2];
 if (!name) throw new Error("usage: pnpm ens:resolve <name.eth>");
 const labels = name.split(".");
 const deployment = loadEnsDeployment();

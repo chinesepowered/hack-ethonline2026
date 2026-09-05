@@ -32,7 +32,7 @@ function arg(name: string): string | undefined {
 }
 const flag = (name: string) => process.argv.includes(`--${name}`);
 
-const label = process.argv[2];
+const label = process.argv.filter((a) => a !== "--")[2];
 if (!label || label.startsWith("--")) throw new Error("usage: pnpm ens:register <label> --url <serviceUrl> [--service-key 0x..] [--days 30]");
 const deployment = loadEnsDeployment();
 if (!deployment) throw new Error("No namespace yet — run pnpm ens:deploy first");

@@ -173,6 +173,21 @@ packages/ens       deploy-namespace, register-service, revoke-service, resolve, 
 hackathon.md       bounty analysis and the reasoning behind this project
 ```
 
+## Live deployment (testnets)
+
+| What | Where |
+|---|---|
+| ENSv2 namespace `rugradar.eth` (Sepolia) | registered on the ENSv2 ETH Registrar, tx `0x81c5442f…96df` |
+| Our PermissionedRegistry (UserRegistry proxy) | [`0x8ff7afe6ad9ED3D06caDFD487fdf059c1938Aa36`](https://sepolia.etherscan.io/address/0x8ff7afe6ad9ED3D06caDFD487fdf059c1938Aa36) |
+| Our PermissionedResolver proxy | [`0x132145725Cf0553E226B9e83C461C5F42250E0Ee`](https://sepolia.etherscan.io/address/0x132145725Cf0553E226B9e83C461C5F42250E0Ee) |
+| Service name | [`api.rugradar.eth`](https://sepolia.app.ens.domains/api.rugradar.eth) — expiring, non-transferable, `x402.pricing` delegated to `0x129d…9841` |
+| Agent name | [`scout.rugradar.eth`](https://sepolia.app.ens.domains/scout.rugradar.eth) |
+| Hedera service account (payTo) | [`0.0.5639476`](https://hashscan.io/testnet/account/0.0.5639476) |
+| Hedera agent account | [`0.0.10372230`](https://hashscan.io/testnet/account/0.0.10372230) |
+| HCS settlement audit topic | [`0.0.10372243`](https://hashscan.io/testnet/topic/0.0.10372243) |
+| HCS agent spend ledger | [`0.0.10372244`](https://hashscan.io/testnet/topic/0.0.10372244) |
+| First real x402 settlement (0.015 HBAR via Blocky402) | [`0.0.7162784@1788575455.336108666`](https://hashscan.io/testnet/transaction/0.0.7162784%401788575455.336108666) |
+
 ## Honest notes
 
 - ENSv2 contracts on Sepolia are beta and "may change"; addresses and ABIs are pinned in `packages/shared/src/ens.ts` and were verified against the live deployment (bytecode present, `MIN_COMMITMENT_AGE = 60`).

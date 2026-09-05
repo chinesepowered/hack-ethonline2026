@@ -10,8 +10,8 @@ import { sepolia } from "viem/chains";
 import { RECORD_KEYS, env, loadEnsDeployment, nodeOf, permissionedResolverAbi } from "@rugradar/shared";
 import { admin, publicClient, rpc, sendAndWait } from "./clients.ts";
 
-const label = process.argv[2];
-const value = process.argv[3];
+const label = process.argv.filter((a) => a !== "--")[2];
+const value = process.argv.filter((a) => a !== "--")[3];
 if (!label || !value) throw new Error('usage: pnpm ens:service-update <label> "<new x402.pricing value>"');
 const deployment = loadEnsDeployment();
 if (!deployment) throw new Error("No namespace yet — run pnpm ens:deploy first");
