@@ -192,7 +192,13 @@ export async function findPools(symbols: string[], protocols: ProtocolDef[] = DE
   const wanted = symbols.map((s) => s.trim().toUpperCase());
   const results = await Promise.allSettled(protocols.map((p) => fetchTopPools(p, perProtocol)));
   const pools = results.flatMap((r) => (r.status === "fulfilled" ? r.value : []));
-  return pools.filter((p) => wanted.every((w) => p.tokens.some((t) => t.toUpperCase() === w)));
+  const matches = pools.filter((p) => wanted.every((w) => p.tokens.some((t) => t.toUpperCase() === w)));
+  // Prefer an exact pair/set (WETH,USDC → a 2-token pool, not a 3-token tricrypto pool), then deepest TVL.
+  return matches.sort((a, b) => {
+    const exactA = a.tokens.length === wanted.length ? 0 : 1;
+    const exactB = b.tokens.length === wanted.length ? 0 : 1;
+    return exactA - exactB || b.tvlUsd - a.tvlUsd;
+  });
 }
 
 // ───────────────────────────── token prices ─────────────────────────────

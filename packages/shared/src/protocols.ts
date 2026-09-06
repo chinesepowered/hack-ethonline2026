@@ -6,6 +6,10 @@
  * same `lending` schema (Market / Liquidate / Withdraw). That is the leverage:
  * one query string, N protocols. IDs come from messari/subgraphs
  * deployment/deployment.json (decentralized-network query-id).
+ *
+ * Verified live on 2026-09-06 (`pnpm graph:smoke`): all entries below are at chain head.
+ * Dropped: balancer-v2-ethereum (indexers report indexing_error) and
+ * pancakeswap-v3-ethereum (no allocations on the network).
  */
 export type Schema = "dex-amm" | "lending";
 
@@ -45,20 +49,6 @@ export const PROTOCOLS: Record<string, ProtocolDef> = {
     schema: "dex-amm",
     schemaVersion: "1.3.0",
     subgraphId: "3fy93eAT56UJsRCEht8iFhfi6wjHWXtZ9dnnbQmvFopF",
-  },
-  "balancer-v2": {
-    key: "balancer-v2",
-    name: "Balancer v2",
-    schema: "dex-amm",
-    schemaVersion: "1.3.0",
-    subgraphId: "794H6CNzdGF5YfBK9nPsUgGn7EBbdJSCTjgcKPEPyFnn",
-  },
-  "pancakeswap-v3": {
-    key: "pancakeswap-v3",
-    name: "PancakeSwap v3",
-    schema: "dex-amm",
-    schemaVersion: "4.0.1",
-    subgraphId: "JAGXF8B14mpB8QGKnwhKTs5JxsQZBJQvbDGFcWwL7gbm",
   },
   "aave-v3": {
     key: "aave-v3",

@@ -174,7 +174,9 @@ Project name: **Rug Radar**. Code is in this repo (pnpm workspace: `packages/sha
 
 Verified without credentials: typecheck clean; service boots against the live Blocky402 testnet facilitator and returns correct metered `402` quotes (HBAR + USDC, facilitator feePayer merged); agent budget guard blocks over-budget quotes before signing; ENSv2 Sepolia addresses have bytecode, `rugradar.eth` is available (8 MockUSDC/yr, 60 s commitment age), Universal Resolver resolution works through viem; Substreams request builds against `ethereum-common`; GraphQL fields validated against Messari schemas 1.3 / 4.0 / lending 3.1.
 
-Needs your keys to finish: `GRAPH_API_KEY` (run `pnpm graph:smoke`), two Hedera testnet ECDSA accounts (`pnpm hedera:topics`, then a funded paid call), `LLM_BASE_URL` / `LLM_API_KEY` / `LLM_MODEL` for an OpenAI-compatible Qwen 3.8 endpoint (agent run), Sepolia key with ETH (`pnpm ens:deploy`, `pnpm ens:register api …`), optional `SUBSTREAMS_API_TOKEN` for the live wire.
+Update 2026-09-06: everything is live on testnets. `rugradar.eth` + `api.`/`scout.` subnames on ENSv2 Sepolia; real x402 settlements on Hedera via Blocky402 with HCS audit records; full agent run with live Graph data (3 paid calls, 0.075 HBAR, verdict anchored on HCS). Remaining: a public service URL before recording (re-run `pnpm ens:register api --url …`), optional Substreams token.
+
+Originally needed: `GRAPH_API_KEY` (run `pnpm graph:smoke`), two Hedera testnet ECDSA accounts (`pnpm hedera:topics`, then a funded paid call), `LLM_BASE_URL` / `LLM_API_KEY` / `LLM_MODEL` for an OpenAI-compatible Qwen 3.8 endpoint (agent run), Sepolia key with ETH (`pnpm ens:deploy`, `pnpm ens:register api …`), optional `SUBSTREAMS_API_TOKEN` for the live wire.
 
 ## 7. Idea shortlist (15) and revised pick
 
