@@ -18,6 +18,9 @@ import {
 import { FACILITATOR_URL, NETWORK, PAY_TO, PRICING, USDC, audit } from "./x402.ts";
 import { whaleWire } from "./substreams.ts";
 
+const POOL_PICK_TTL_MS = 6 * 3600 * 1000;
+const poolPickCache = new Map<string, { poolId: string; protocol: string; at: number }>();
+
 const str = (v: unknown): string | undefined => (Array.isArray(v) ? String(v[0]) : v === undefined ? undefined : String(v));
 
 function fail(res: Response, status: number, message: string) {
@@ -69,11 +72,20 @@ export async function poolRisk(req: Request, res: Response): Promise<void> {
 
     if (!poolId) {
       if (!tokens) return fail(res, 400, "pass ?pool=0x... (with ?protocol=) or ?tokens=WETH,USDC");
-      const matches = await findPools(tokens.split(","), protocol ? [protocol] : DEX_PROTOCOLS);
-      if (!matches.length) return fail(res, 404, `no pool found for tokens ${tokens}`);
-      const best = matches.sort((a, b) => b.tvlUsd - a.tvlUsd)[0];
-      poolId = best.id;
-      protocol = getProtocol(best.protocol);
+      // Pool search fans out to every DEX and gateway latency varies a lot; pools don't change, so cache the pick.
+      const cacheKey = `${protocol?.key ?? "*"}:${tokens.toUpperCase().split(",").map((s) => s.trim()).sort().join(",")}`;
+      const cached = poolPickCache.get(cacheKey);
+      if (cached && Date.now() - cached.at < POOL_PICK_TTL_MS) {
+        poolId = cached.poolId;
+        protocol = getProtocol(cached.protocol);
+      } else {
+        const matches = await findPools(tokens.split(","), protocol ? [protocol] : DEX_PROTOCOLS);
+        if (!matches.length) return fail(res, 404, `no pool found for tokens ${tokens}`);
+        const best = matches[0]; // already ranked: exact pair first, then cumulative volume
+        poolId = best.id;
+        protocol = getProtocol(best.protocol);
+        poolPickCache.set(cacheKey, { poolId, protocol: protocol.key, at: Date.now() });
+      }
     }
     if (!protocol) return fail(res, 400, "?protocol= is required when passing ?pool=");
     if (protocol.schema !== "dex-amm") return fail(res, 400, `${protocol.key} is a lending protocol; use /v1/protocol-health`);
