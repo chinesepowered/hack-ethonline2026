@@ -149,6 +149,8 @@ pnpm agent "Is the WETH/USDC pool on Uniswap v3 being drained right now? Should 
 
 For a local run before ENS is set up, `SERVICE_URL_OVERRIDE=http://localhost:4021 pnpm demo:curl "/v1/whales?protocols=curve"` skips discovery.
 
+**Public URL.** The service is a long-lived process (facilitator sync at boot, open Substreams stream, SSE windows up to 120 s), so it does not fit serverless hosting. For a demo, `pnpm tunnel` (cloudflared quick tunnel) prints a `https://*.trycloudflare.com` URL; set it as `SERVICE_URL`, restart the service, and republish the records with `pnpm ens:register api --url <url>`. For a stable URL, deploy the service package to Railway, Render, or Fly with the same `.env`.
+
 ## Demo script (3–4 minutes)
 
 1. **Problem (20 s).** LPs find out about a drain after the fact. Agents can watch pools 24/7, but they need data they can *buy*, not API keys and subscriptions.

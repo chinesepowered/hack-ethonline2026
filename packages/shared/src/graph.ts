@@ -122,13 +122,13 @@ const poolRiskQuery = (p: ProtocolDef, poolId: string) => /* GraphQL */ `
       dailySnapshots(first: 8, orderBy: timestamp, orderDirection: desc) {
         timestamp totalValueLockedUSD dailyVolumeUSD
       }
-      withdraws(first: 100, orderBy: amountUSD, orderDirection: desc, where: { timestamp_gt: $since }) {
+      withdraws(first: 50, orderBy: amountUSD, orderDirection: desc, where: { timestamp_gt: $since }) {
         hash timestamp ${actorField(p)} amountUSD
       }
-      deposits(first: 100, orderBy: amountUSD, orderDirection: desc, where: { timestamp_gt: $since }) {
+      deposits(first: 50, orderBy: amountUSD, orderDirection: desc, where: { timestamp_gt: $since }) {
         amountUSD
       }
-      swaps(first: 50, orderBy: amountInUSD, orderDirection: desc, where: { timestamp_gt: $since }) {
+      swaps(first: 30, orderBy: amountInUSD, orderDirection: desc, where: { timestamp_gt: $since }) {
         hash timestamp ${actorField(p)} amountInUSD tokenIn { symbol } tokenOut { symbol }
       }
     }
