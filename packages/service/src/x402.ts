@@ -94,19 +94,23 @@ export function createResourceServer(): x402ResourceServer {
     const asset = String(ctx.requirements.asset);
     const human = asset === HBAR_ASSET ? `${tinybarToHbar(amount)} HBAR` : `${Number(amount) / 1e6} USDC`;
     console.log(`[x402] settled ${human} from ${ctx.result.payer ?? "?"} for ${path} → tx ${ctx.result.transaction}`);
-    const consensusTx = await audit.log({
-      v: 1,
-      kind: "x402.settled",
-      at: new Date().toISOString(),
-      path,
-      network: ctx.result.network,
-      payer: ctx.result.payer ?? null,
-      payTo: PAY_TO,
-      asset,
-      amount,
-      settlementTx: ctx.result.transaction,
-    });
-    if (consensusTx) console.log(`[hcs] audit record ${consensusTx} on topic ${audit.topicId}`);
+    // Fire-and-forget: the audit write must not delay the paid response.
+    void audit
+      .log({
+        v: 1,
+        kind: "x402.settled",
+        at: new Date().toISOString(),
+        path,
+        network: ctx.result.network,
+        payer: ctx.result.payer ?? null,
+        payTo: PAY_TO,
+        asset,
+        amount,
+        settlementTx: ctx.result.transaction,
+      })
+      .then((consensusTx) => {
+        if (consensusTx) console.log(`[hcs] audit record ${consensusTx} on topic ${audit.topicId}`);
+      });
   });
 
   server.onSettleFailure(async (ctx) => {
