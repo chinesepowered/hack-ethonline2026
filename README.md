@@ -12,13 +12,13 @@ Built from scratch at ETHOnline 2026 for three bounties:
 | **The Graph — Composable / Standardized Graph Products** | Every endpoint runs **one query string across many protocols** using the **Messari Standardized Subgraphs** (`dex-amm` schema: Uniswap v3, Uniswap v2, SushiSwap, Curve; `lending` schema: Aave v3, Compound v3, Spark). The live whale wire **composes Substreams** (`ethereum-common` package, `filtered_events`) **with a standardized subgraph** for pricing. All data is live from The Graph Network gateway; nothing is mocked. |
 | **ENS — Best Use of ENSv2 (Sepolia)** | The namespace `rugradar.eth` owns its **own PermissionedRegistry** and **own PermissionedResolver** (deployed through the VerifiableFactory). Services are **expiring, non-transferable, revocable subnames**; their x402 endpoint, price list, pay-to account and audit topic are **text records** (ENSIP-26 `agent-endpoint[x402]` + `agent-context`). **Enhanced Access Control** delegates exactly one text key (`x402.pricing`) to the service's own key. The agent discovers services by **walking the registry** and resolving through the **Universal Resolver**; nothing about the paid API is hard-coded in the agent. Agents get their own identity subnames too. |
 
-## A real run (2026-09-06, Hedera testnet + ENSv2 Sepolia + The Graph Network)
+## A real run (Hedera testnet + ENSv2 Sepolia + The Graph Network)
 
 ```
 🛰  Rug Radar agent · wallet 0.0.10372230 on hedera:testnet · budget 1 HBAR · model Qwen/Qwen3.8-27B
 ❓ Is the WETH/USDC pool on Uniswap v3 being drained right now? Should an LP exit?
 ⚙ discover_services({})            ENS discovery: 1 service(s): api.rugradar.eth
-⚙ read_catalog(...)                → GET http://…/v1/catalog (free)
+⚙ read_catalog(...)                → GET https://…/v1/catalog (free)
 ⚙ pool_risk({"tokens":["WETH","USDC"]})   paid 0.03 HBAR · settlement 0.0.7162784@1788663313.356227872 · HCS 0.0.10372230@1788663360.527369081
 ⚙ scan_whales({"protocols":["uniswap-v3"]}) paid 0.015 HBAR · settlement 0.0.7162784@1788663359.073787482
 ⚙ pool_risk({"protocol":"uniswap-v3","pool":"0xe0554a47…"}) paid 0.03 HBAR · settlement 0.0.7162784@1788663385.026425010
@@ -35,38 +35,43 @@ many addresses, large swaps run both ways. Recommended action: no exit needed.
 
 ```mermaid
 flowchart LR
-  subgraph Agent["packages/agent — LLM agent (Qwen 3.8) with a Hedera wallet"]
-    A1[discover_services] --> A2[read_catalog]
-    A2 --> A3[pool_risk / scan_whales / protocol_health / watch_whale_wire]
-    A3 --> A4[budget guard + HCS spend ledger]
+  subgraph Agent["packages/agent · LLM agent (Qwen 3.8) with a Hedera wallet"]
+    A1["discover_services"] --> A2["read_catalog"]
+    A2 --> A3["pool_risk · scan_whales · protocol_health · watch_whale_wire"]
+    A3 --> A4["budget guard + HCS spend ledger"]
   end
 
   subgraph ENS["ENSv2 · Sepolia"]
-    E1[(ETHRegistry\nrugradar.eth)] --> E2[(our PermissionedRegistry\napi · scout)]
-    E2 --> E3[(our PermissionedResolver\nagent-endpoint[x402], x402.*, hcs.*)]
+    E1[("ETHRegistry<br/>rugradar.eth")] --> E2[("our PermissionedRegistry<br/>api · scout")]
+    E2 --> E3[("our PermissionedResolver<br/>agent-endpoint, x402.*, hcs.* records")]
   end
 
-  subgraph Service["packages/service — x402-gated API on Hedera"]
-    S1[GET /v1/whales] & S2[GET /v1/pool-risk] & S3[GET /v1/protocol-health] & S4[GET /v1/stream/whales SSE]
-    S5[onAfterSettle → HCS audit]
+  subgraph Service["packages/service · x402-gated API on Hedera"]
+    S1["GET /v1/whales"]
+    S2["GET /v1/pool-risk"]
+    S3["GET /v1/protocol-health"]
+    S4["GET /v1/stream/whales (SSE)"]
+    S5["onAfterSettle → HCS audit"]
   end
 
   subgraph Graph["The Graph"]
-    G1[(Messari standardized subgraphs\n4 DEX + 3 lending)]
-    G2[(Substreams ethereum-common\nfiltered_events)]
+    G1[("Messari standardized subgraphs<br/>4 DEX + 3 lending")]
+    G2[("Substreams ethereum-common<br/>filtered_events")]
   end
 
   subgraph Hedera["Hedera testnet"]
-    H1[Blocky402 facilitator\nverify + settle]
-    H2[(HCS topics\nsettlements · spend ledger)]
+    H1["Blocky402 facilitator<br/>verify + settle"]
+    H2[("HCS topics<br/>settlements · spend ledger")]
   end
 
-  A1 -- Universal Resolver --> E3
+  A1 -- "Universal Resolver" --> E3
   A3 -- "402 → PAYMENT-SIGNATURE" --> Service
-  Service -- verify/settle --> H1
-  S1 & S2 & S3 --> G1
+  Service -- "verify / settle" --> H1
+  S1 --> G1
+  S2 --> G1
+  S3 --> G1
   S4 --> G2
-  S4 -. token prices .-> G1
+  S4 -. "token prices" .-> G1
   S5 --> H2
   A4 --> H2
 ```
@@ -83,10 +88,10 @@ sequenceDiagram
   participant Graph as The Graph
 
   Agent->>ENS: getEnsText("api.rugradar.eth", "agent-endpoint[x402]")
-  ENS-->>Agent: https://…/v1  (+ x402.network, x402.payTo, x402.pricing, hcs.audit)
+  ENS-->>Agent: https://…/v1 (+ x402.network, x402.payTo, x402.pricing, hcs.audit)
   Agent->>Svc: GET /v1/pool-risk?tokens=WETH,USDC
   Svc-->>Agent: 402 · PAYMENT-REQUIRED (0.03 HBAR or $0.003 USDC, payTo, feePayer)
-  Note over Agent: budget guard checks the quote *before* signing
+  Note over Agent: budget guard checks the quote before signing
   Agent->>Agent: sign Hedera TransferTransaction (ECDSA)
   Agent->>Svc: GET … · PAYMENT-SIGNATURE
   Svc->>Fac: /verify
@@ -94,9 +99,9 @@ sequenceDiagram
   Svc->>Fac: /settle
   Fac->>Hedera: submit transfer
   Svc-->>Agent: 200 · JSON risk score · PAYMENT-RESPONSE (tx id)
-  Svc->>Hedera: HCS: x402.settled {path, payer, amount, tx}
-  Agent->>Hedera: HCS: x402.paid {url, amount, tx}
-  Agent->>Hedera: HCS: agent.decision {verdict, payments[]}
+  Svc->>Hedera: HCS x402.settled {path, payer, amount, tx}
+  Agent->>Hedera: HCS x402.paid {url, amount, tx}
+  Agent->>Hedera: HCS agent.decision {verdict, payments}
 ```
 
 If the upstream data fails (every protocol query errors, or the stream has no source), the handler returns a non-2xx status and the x402 middleware **cancels the payment** — the agent is never charged for nothing.
@@ -149,21 +154,14 @@ pnpm agent "Is the WETH/USDC pool on Uniswap v3 being drained right now? Should 
 
 For a local run before ENS is set up, `SERVICE_URL_OVERRIDE=http://localhost:4021 pnpm demo:curl "/v1/whales?protocols=curve"` skips discovery.
 
-**Public URL.** The service is a long-lived process (facilitator sync at boot, open Substreams stream, SSE windows up to 120 s), so it does not fit serverless hosting. For a demo, `pnpm tunnel` (cloudflared quick tunnel) prints a `https://*.trycloudflare.com` URL; set it as `SERVICE_URL`, restart the service, and republish the records with `pnpm ens:register api --url <url>`. For a stable URL, deploy the service package to Railway, Render, or Fly with the same `.env`.
+**Public URL.** The service is a long-lived process (facilitator sync at boot, open Substreams stream, SSE windows up to 120 s), so it does not fit serverless hosting. It runs on Render's free tier at `https://rugradar.onrender.com` (sleeps after 15 min idle; hit `/health` to wake it). For a quick alternative, `pnpm tunnel` (cloudflared) prints a `https://*.trycloudflare.com` URL; set it as `SERVICE_URL`, restart the service, and republish the records with `pnpm ens:register api --url <url>`.
 
-## Demo script (3–4 minutes)
-
-1. **Problem (20 s).** LPs find out about a drain after the fact. Agents can watch pools 24/7, but they need data they can *buy*, not API keys and subscriptions.
-2. **Discovery (30 s).** `pnpm ens:resolve api.rugradar.eth` — show the records, the registry hierarchy (`ETHRegistry → our registry → our resolver`), expiry and `transferable: false`. `pnpm ens:service-update api "…"` — the service key edits its price and is refused on any other record.
-3. **Pay (60 s).** `pnpm demo:curl "/v1/pool-risk?tokens=WETH,USDC"` — terminal shows `402`, the HBAR quote, the settlement id; open the HashScan link; open the HCS topic and show the `x402.settled` record.
-4. **Reason (60 s).** `pnpm agent "…"` — the agent discovers, reads the catalog, buys two or three calls within budget, and prints a verdict with evidence and the list of payments. Show the `agent.decision` record on HCS.
-5. **Standards leverage (30 s).** `pnpm graph:smoke` — the same query string running on four DEXes and three lenders; point at `packages/shared/src/graph.ts` and the one line that differs between schema 1.3 and 4.0.
-6. **Why mainnet (20 s).** Flip `HEDERA_NETWORK=mainnet` and the facilitator URL; nothing else changes. ENSv2 records move with the name.
+See `demo.md` for the recording runbook and `slides.html` for the four-slide pitch.
 
 ## The Graph: what the standard bought us
 
-- `packages/shared/src/protocols.ts` — seven protocols, one registry of subgraph IDs from Messari's deployment manifest, all verified at chain head.
-- `packages/shared/src/graph.ts` — three query strings (`whales`, `pool-risk`, `lending-health`) serve seven protocols. The only divergence we hit between schema majors is the event actor field (`from` in 1.3, `account { id }` in 4.0), handled by a one-line switch. Adding an eighth protocol is one JSON entry.
+- `packages/shared/src/protocols.ts` — seven protocols, one registry of subgraph IDs from Messari's deployment manifest, all verified at chain head. (Messari's Balancer v2 and PancakeSwap v3 Ethereum subgraphs are currently unhealthy on the network and were left out; re-adding one is a single JSON entry.)
+- `packages/shared/src/graph.ts` — three query strings (`whales`, `pool-risk`, `lending-health`) serve seven protocols. The only divergence we hit between schema majors is the event actor field (`from` in 1.3, `account { id }` in 4.0), handled by a one-line switch. Pool search uses the standardized `inputTokens_contains` filter with canonical token addresses on every DEX.
 - `packages/service/src/substreams.ts` — the live wire composes the reusable **`ethereum-common`** Substreams package (`filtered_events` with an `evt_sig:` query string) with the standardized Uniswap v3 subgraph for `lastPriceUSD`. Set `SUBSTREAMS_API_TOKEN` (Pinax or StreamingFast) to enable; without it the stream polls the standardized subgraphs so it is still live data.
 
 ## ENSv2 features exercised
@@ -186,11 +184,13 @@ For a local run before ENS is set up, `SERVICE_URL_OVERRIDE=http://localhost:402
 - Server `onAfterSettle` hook → `TopicMessageSubmitTransaction` on `HCS_SERVICE_TOPIC_ID` with `{path, payer, amount, asset, settlementTx}`.
 - Agent decodes `PAYMENT-RESPONSE`, enforces `AGENT_BUDGET_HBAR` *before* signing (reads the `PAYMENT-REQUIRED` quote), mirrors each payment to `HCS_AGENT_TOPIC_ID`, then anchors its final verdict there as well.
 - `/.well-known/agent-registration.json` is an ERC-8004 registration file (`x402Support: true`); fill `ERC8004_REGISTRY` / `ERC8004_AGENT_ID` after registering with an Identity Registry.
+- The risk score is a transparent heuristic over standardized fields; every factor prints its evidence so an LP (or an LLM) can disagree with it. Testnet only; nothing here is audited.
 
 ## Live deployment (testnets)
 
 | What | Where |
 |---|---|
+| Service (Render free tier) | `https://rugradar.onrender.com/v1/catalog` |
 | ENSv2 namespace `rugradar.eth` (Sepolia) | registered on the ENSv2 ETH Registrar, tx `0x81c5442f…96df` |
 | Our PermissionedRegistry (UserRegistry proxy) | [`0x8ff7afe6ad9ED3D06caDFD487fdf059c1938Aa36`](https://sepolia.etherscan.io/address/0x8ff7afe6ad9ED3D06caDFD487fdf059c1938Aa36) |
 | Our PermissionedResolver proxy | [`0x132145725Cf0553E226B9e83C461C5F42250E0Ee`](https://sepolia.etherscan.io/address/0x132145725Cf0553E226B9e83C461C5F42250E0Ee) |
@@ -209,13 +209,5 @@ packages/shared    protocols registry, Graph gateway client + queries, risk scor
 packages/service   Express + @x402/express on Hedera (Blocky402), metered routes, SSE stream, Substreams wire, ERC-8004 file
 packages/agent     tool-calling LLM agent (OpenAI-compatible API, Qwen 3.8), ENS discovery, paying fetch with budget guard, HCS spend ledger, curl demo
 packages/ens       deploy-namespace, register-service, service-update (EAC demo), revoke-service, resolve, list (viem, Sepolia)
-hackathon.md       bounty analysis and the reasoning behind this project
+demo.md            recording runbook · slides.html: four-slide pitch · hackathon.md: bounty analysis
 ```
-
-## Honest notes
-
-- ENSv2 contracts on Sepolia are beta and "may change"; addresses and ABIs are pinned in `packages/shared/src/ens.ts` and were verified against the live deployment.
-- Messari's Balancer v2 and PancakeSwap v3 Ethereum subgraphs are currently unhealthy on the network (indexing errors / no allocations) and were dropped from the registry; re-adding one is a single JSON entry.
-- The risk score is a transparent heuristic over standardized fields, not a trained model. Every factor prints its evidence so an LP (or an LLM) can disagree with it.
-- Substreams whale detection watches five tokens (USDC, USDT, DAI, WETH, WBTC) by default; edit `WATCHED_TOKENS`.
-- Nothing here is audited. Testnet only unless you know what you are doing.

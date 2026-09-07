@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Rug Radar — pitch</title>
+<style>
+  :root {
+    --bg: #0b1020; --panel: #121a30; --ink: #e8ecf5; --muted: #9aa6c2; --accent: #3ddc97; --warn: #ff5c5c; --line: #223052;
+    --mono: ui-monospace, "JetBrains Mono", "SF Mono", Consolas, monospace;
+    --sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink); font-family: var(--sans); }
+  .deck { height: 100%; overflow: hidden; }
+  .slide { height: 100vh; width: 100vw; padding: 6vh 8vw; display: none; flex-direction: column; justify-content: center; gap: 2.2vh; }
+  .slide.active { display: flex; }
+  .kicker { color: var(--accent); font-family: var(--mono); font-size: 1.6vh; letter-spacing: .18em; text-transform: uppercase; }
+  h1 { font-size: 6.4vh; line-height: 1.05; margin: 0; font-weight: 800; letter-spacing: -.02em; }
+  h2 { font-size: 4.6vh; line-height: 1.1; margin: 0; font-weight: 800; letter-spacing: -.02em; }
+  p.lead { font-size: 2.6vh; color: var(--muted); max-width: 60vw; margin: 0; line-height: 1.4; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2vh; margin-top: 1vh; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 1.4vh; padding: 2.4vh; }
+  .card h3 { margin: 0 0 1vh; font-size: 2.3vh; color: var(--accent); }
+  .card p, .card li { font-size: 1.95vh; color: var(--ink); line-height: 1.45; margin: 0; }
+  .card ul { margin: 0; padding-left: 2.2vh; }
+  .flow { display: flex; align-items: stretch; gap: 1.2vh; margin-top: 1vh; }
+  .step { flex: 1; background: var(--panel); border: 1px solid var(--line); border-radius: 1.2vh; padding: 1.8vh; font-size: 1.9vh; line-height: 1.4; position: relative; }
+  .step b { display: block; color: var(--accent); font-family: var(--mono); font-size: 1.5vh; margin-bottom: .6vh; letter-spacing: .08em; }
+  .step + .step::before { content: "→"; position: absolute; left: -1.5vh; top: 45%; color: var(--muted); font-size: 2.4vh; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2vh; margin-top: 1vh; }
+  .stat { background: var(--panel); border: 1px solid var(--line); border-radius: 1.2vh; padding: 2vh; }
+  .stat .n { font-size: 4.2vh; font-weight: 800; color: var(--accent); font-family: var(--mono); }
+  .stat .l { font-size: 1.7vh; color: var(--muted); margin-top: .4vh; }
+  pre { background: #070b16; border: 1px solid var(--line); border-radius: 1.2vh; padding: 2vh; font-family: var(--mono); font-size: 1.75vh; line-height: 1.5; color: #cfe3ff; overflow: hidden; margin: 0; }
+  pre .ok { color: var(--accent); } pre .dim { color: var(--muted); } pre .hot { color: var(--warn); }
+  .foot { position: fixed; bottom: 2.4vh; left: 8vw; right: 8vw; display: flex; justify-content: space-between; font-family: var(--mono); font-size: 1.5vh; color: var(--muted); }
+  .radar { width: 9vh; height: 9vh; }
+  .brand { display: flex; align-items: center; gap: 2vh; }
+  a { color: var(--accent); text-decoration: none; }
+  .tag { display: inline-block; font-family: var(--mono); font-size: 1.5vh; padding: .3vh 1vh; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); margin-right: .8vh; }
+</style>
+</head>
+<body>
+<div class="deck">
+
+  <!-- 1 · Problem + what it is -->
+  <section class="slide active">
+    <div class="brand">
+      <svg class="radar" viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="#121a30" stroke="#223052"/><circle cx="32" cy="32" r="20" fill="none" stroke="#3ddc97" stroke-width="2"/><circle cx="32" cy="32" r="10" fill="none" stroke="#3ddc97" stroke-width="2"/><path d="M32 32 L32 4" stroke="#3ddc97" stroke-width="3"/><circle cx="44" cy="22" r="3" fill="#ff5c5c"/></svg>
+      <div>
+        <div class="kicker">ETHOnline 2026 · Hedera × The Graph × ENS</div>
+        <h1>Rug Radar</h1>
+      </div>
+    </div>
+    <p class="lead">LPs learn about a drain after the fact. Agents could watch every pool 24/7 — but only if they can <em>buy</em> live intelligence per call, with no API keys, no subscriptions, and a receipt they can prove.</p>
+    <div class="grid">
+      <div class="card"><h3>What it is</h3><p>An x402-metered DeFi risk service — drain scores, whale flows, lending stress — and an autonomous agent with its own wallet that finds it, pays for it, and decides.</p></div>
+      <div class="card"><h3>Why now</h3><p>x402 gives machines a pay-per-request rail. Standardized subgraphs give one schema across protocols. ENSv2 gives services a name and a permission model. We wired all three.</p></div>
+      <div class="card"><h3>Built from scratch</h3><p>4 packages, 7 protocols, 2 chains, 1 hackathon. Everything in this deck ran for real on testnets.</p></div>
+    </div>
+    <div class="foot"><span>1 / 4</span><span>github.com/chinesepowered/hack-ethonline2026</span></div>
+  </section>
+
+  <!-- 2 · How it works -->
+  <section class="slide">
+    <div class="kicker">How one question becomes a paid, audited decision</div>
+    <h2>Discover on ENS → pay with x402 on Hedera → reason over The Graph</h2>
+    <div class="flow">
+      <div class="step"><b>1 · DISCOVER</b>Agent resolves <code>api.rugradar.eth</code> through the ENSv2 Universal Resolver: endpoint, prices, pay-to account, audit topic. Nothing hard-coded.</div>
+      <div class="step"><b>2 · QUOTE</b>Service answers <code>402</code> with a metered price — per protocol, per lookback day, per 15-second stream window. HBAR or HTS USDC.</div>
+      <div class="step"><b>3 · PAY</b>Budget guard checks the quote <em>before</em> signing. Blocky402 verifies + settles on Hedera in ~1 s; facilitator pays the fee.</div>
+      <div class="step"><b>4 · DATA</b>One standardized query runs on Uniswap v3/v2, SushiSwap, Curve, Aave v3, Compound v3, Spark. Substreams feed the live whale wire.</div>
+      <div class="step"><b>5 · PROVE</b>Settlement, agent spend and the final verdict are written to two Hedera Consensus Service topics. Failed data = payment cancelled.</div>
+    </div>
+<pre>$ pnpm agent "Is the WETH/USDC pool on Uniswap v3 being drained right now?"
+<span class="dim">⚙ discover_services → api.rugradar.eth
+⚙ pool_risk({"tokens":["WETH","USDC"]})      paid 0.03 HBAR  · settlement 0.0.7162784@1788663313.356227872
+⚙ scan_whales({"protocols":["uniswap-v3"]})  paid 0.015 HBAR · settlement 0.0.7162784@1788663359.073787482</span>
+<span class="ok">Verdict: Watch</span> — 68% of TVL withdrawn in 24h but offset by $2.51M deposits (net +$22.9k); outflow spread across many addresses. <span class="ok">No exit needed.</span>
+<span class="dim">🧾 Decision anchored on HCS · spent 0.075 HBAR of 1</span></pre>
+    <div class="foot"><span>2 / 4</span><span>x402 v2 · Blocky402 · Messari standardized subgraphs · Substreams ethereum-common · ENSv2 Sepolia beta</span></div>
+  </section>
+
+  <!-- 3 · Bounty fit -->
+  <section class="slide">
+    <div class="kicker">Each sponsor is load-bearing — remove one and the demo breaks</div>
+    <h2>Three bounties, one product</h2>
+    <div class="grid">
+      <div class="card"><h3>Hedera · AI &amp; Agentic Payments</h3><ul>
+        <li>Live x402 service on Hedera testnet, settled via <b>Blocky402</b></li>
+        <li><b>Metered</b> pricing + <b>streamed</b> 15 s windows (SSE)</li>
+        <li>HBAR and <b>HTS USDC</b> in the settlement path</li>
+        <li><b>HCS audit trail</b>: every settlement, every agent decision</li>
+        <li>ERC-8004 registration file; discovery directory via ENS</li></ul></div>
+      <div class="card"><h3>The Graph · Composable / Standardized</h3><ul>
+        <li><b>One query string, seven protocols</b> (Messari dex-amm + lending schemas)</li>
+        <li>Substreams <code>ethereum-common</code> composed with a standardized subgraph for pricing</li>
+        <li>All data live from The Graph Network gateway — no mocks</li>
+        <li>Schema drift handled in one line (<code>from</code> vs <code>account{id}</code>)</li></ul></div>
+      <div class="card"><h3>ENS · Best Use of ENSv2</h3><ul>
+        <li><code>rugradar.eth</code> runs its <b>own PermissionedRegistry + Resolver</b></li>
+        <li>Services are <b>expiring, non-transferable, revocable</b> subnames</li>
+        <li>ENSIP-26 <code>agent-endpoint[x402]</code> + <code>x402.*</code> records</li>
+        <li><b>Enhanced Access Control</b>: service key may edit only <code>x402.pricing</code></li>
+        <li>Agents as namespaces: <code>scout.rugradar.eth</code></li></ul></div>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="n">7</div><div class="l">protocols, 3 query strings</div></div>
+      <div class="stat"><div class="n">~1 s</div><div class="l">Hedera settlement per call</div></div>
+      <div class="stat"><div class="n">0.03</div><div class="l">HBAR for a pool drain score</div></div>
+      <div class="stat"><div class="n">0</div><div class="l">API keys the agent holds</div></div>
+    </div>
+    <div class="foot"><span>3 / 4</span><span>Start Fresh track</span></div>
+  </section>
+
+  <!-- 4 · Why it matters / mainnet -->
+  <section class="slide">
+    <div class="kicker">Beyond the hackathon</div>
+    <h2>The pattern for any data an agent should find and pay for on its own</h2>
+    <div class="grid">
+      <div class="card"><h3>Mainnet is a config flip</h3><p><code>HEDERA_NETWORK=mainnet</code> + the mainnet Blocky402 URL. Same code, same ENS name; records move with the name. Free-tier Render deployment already public.</p></div>
+      <div class="card"><h3>Who pays</h3><p>LP bots, treasury monitors, and other agents — priced per call in cents. Providers list one name, set one price record, and get paid in HBAR or USDC with an on-chain receipt.</p></div>
+      <div class="card"><h3>Next</h3><p>More standardized protocols (one JSON entry each), Substreams-native drain detection, ERC-8004 reputation from HCS receipts, and a marketplace of <code>*.rugradar.eth</code> services with delegated pricing rights.</p></div>
+    </div>
+    <div class="card" style="margin-top:1vh">
+      <p><span class="tag">ENS</span> <a href="https://sepolia.app.ens.domains/api.rugradar.eth">api.rugradar.eth</a> &nbsp; <span class="tag">HCS</span> <a href="https://hashscan.io/testnet/topic/0.0.10372243">settlement audit 0.0.10372243</a> &nbsp; <span class="tag">HCS</span> <a href="https://hashscan.io/testnet/topic/0.0.10372244">agent ledger 0.0.10372244</a> &nbsp; <span class="tag">CODE</span> <a href="https://github.com/chinesepowered/hack-ethonline2026">github.com/chinesepowered/hack-ethonline2026</a></p>
+    </div>
+    <div class="foot"><span>4 / 4</span><span>← → or space to navigate</span></div>
+  </section>
+
+</div>
+<script>
+  const slides = [...document.querySelectorAll(".slide")];
+  let i = Math.max(0, Math.min(slides.length - 1, Number(location.hash.slice(1)) - 1 || 0));
+  const show = (n) => { slides.forEach((s, k) => s.classList.toggle("active", k === n)); i = n; location.hash = String(n + 1); };
+  show(i);
+  addEventListener("keydown", (e) => {
+    if (["ArrowRight", " ", "PageDown"].includes(e.key)) show(Math.min(slides.length - 1, i + 1));
+    if (["ArrowLeft", "PageUp"].includes(e.key)) show(Math.max(0, i - 1));
+  });
+  addEventListener("click", (e) => { if (e.target.closest("a")) return; show((i + 1) % slides.length); });
+</script>
+</body>
+</html>
