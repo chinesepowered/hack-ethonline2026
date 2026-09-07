@@ -21,7 +21,7 @@ Target: a 3–4 minute screen recording. Everything below is real (Hedera testne
    - https://hashscan.io/testnet/topic/0.0.10372243 (service settlement audit)
    - https://hashscan.io/testnet/topic/0.0.10372244 (agent spend ledger)
    - `<SERVICE_URL>/v1/catalog`
-5. **Terminal**: big font, dark theme, repo root, `.env` filled. Run `pnpm graph:smoke` once so the gateway is warm.
+5. **Terminal**: big font, dark theme, repo root, `.env` filled. Run `pnpm graph:smoke` once so the gateway is warm, then **one off-camera `pnpm demo:curl "/v1/pool-risk?tokens=WETH,USDC"`**: the first token-pair lookup fans out to every DEX and The Graph gateway can take 5–60 s; the service caches the pick, so the on-camera call is ~10 s.
 
 ## 1. Script (what to say, what to run)
 
