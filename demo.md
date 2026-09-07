@@ -9,7 +9,7 @@ Target: a 3–4 minute screen recording. Everything below is real (Hedera testne
    pnpm service          # terminal A
    pnpm tunnel           # terminal B → copy the https://*.trycloudflare.com URL
    ```
-   Render's free tier sleeps after 15 min idle and takes ~60 s to wake, so **open `<SERVICE_URL>/health` in a browser first** and wait for JSON.
+   Render's free tier sleeps after 15 min idle and takes ~60 s to wake, so **open `<SERVICE_URL>/health` in a browser first** and wait for JSON. Pushes to `main` do **not** auto-deploy (no GitHub app connected); after changing service code run `pnpm render:deploy` (~4 min).
 2. **ENS records point at that URL.** Only needed if the URL changed:
    ```bash
    pnpm ens:register api --url <SERVICE_URL>      # ~2 min, a dozen Sepolia txs
