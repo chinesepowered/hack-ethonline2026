@@ -4,7 +4,7 @@ Target: a 3–4 minute screen recording. Everything below is real (Hedera testne
 
 ## 0. Before you hit record (10 min)
 
-1. **Service is up and public.** Either the Render deployment (`https://rugradar.onrender.com`) or a local run + tunnel:
+1. **Service is up and public.** Either the Render deployment (`https://rugradar-vibj.onrender.com`) or a local run + tunnel:
    ```bash
    pnpm service          # terminal A
    pnpm tunnel           # terminal B → copy the https://*.trycloudflare.com URL

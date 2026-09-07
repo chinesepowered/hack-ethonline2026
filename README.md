@@ -154,7 +154,7 @@ pnpm agent "Is the WETH/USDC pool on Uniswap v3 being drained right now? Should 
 
 For a local run before ENS is set up, `SERVICE_URL_OVERRIDE=http://localhost:4021 pnpm demo:curl "/v1/whales?protocols=curve"` skips discovery.
 
-**Public URL.** The service is a long-lived process (facilitator sync at boot, open Substreams stream, SSE windows up to 120 s), so it does not fit serverless hosting. It runs on Render's free tier at `https://rugradar.onrender.com` (sleeps after 15 min idle; hit `/health` to wake it). For a quick alternative, `pnpm tunnel` (cloudflared) prints a `https://*.trycloudflare.com` URL; set it as `SERVICE_URL`, restart the service, and republish the records with `pnpm ens:register api --url <url>`.
+**Public URL.** The service is a long-lived process (facilitator sync at boot, open Substreams stream, SSE windows up to 120 s), so it does not fit serverless hosting. It runs on Render's free tier at `https://rugradar-vibj.onrender.com` (sleeps after 15 min idle; hit `/health` to wake it). For a quick alternative, `pnpm tunnel` (cloudflared) prints a `https://*.trycloudflare.com` URL; set it as `SERVICE_URL`, restart the service, and republish the records with `pnpm ens:register api --url <url>`.
 
 See `demo.md` for the recording runbook and `slides.html` for the four-slide pitch.
 
@@ -190,7 +190,7 @@ See `demo.md` for the recording runbook and `slides.html` for the four-slide pit
 
 | What | Where |
 |---|---|
-| Service (Render free tier) | `https://rugradar.onrender.com/v1/catalog` |
+| Service (Render free tier) | `https://rugradar-vibj.onrender.com/v1/catalog` |
 | ENSv2 namespace `rugradar.eth` (Sepolia) | registered on the ENSv2 ETH Registrar, tx `0x81c5442f…96df` |
 | Our PermissionedRegistry (UserRegistry proxy) | [`0x8ff7afe6ad9ED3D06caDFD487fdf059c1938Aa36`](https://sepolia.etherscan.io/address/0x8ff7afe6ad9ED3D06caDFD487fdf059c1938Aa36) |
 | Our PermissionedResolver proxy | [`0x132145725Cf0553E226B9e83C461C5F42250E0Ee`](https://sepolia.etherscan.io/address/0x132145725Cf0553E226B9e83C461C5F42250E0Ee) |
