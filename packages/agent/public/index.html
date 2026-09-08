@@ -15,11 +15,11 @@
   header { display:flex; align-items:center; gap:16px; padding:14px 22px; border-bottom:1px solid var(--line); background:var(--panel2); position:sticky; top:0; z-index:5; }
   header h1 { font-size:20px; margin:0; letter-spacing:-.01em; }
   header .sub { color:var(--muted); font-size:12px; }
-  .pills { margin-left:auto; display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  .pills { margin-left:auto; display:flex; gap:8px; flex-wrap:wrap; align-items:center; justify-content:flex-end; }
   .pill { border:1px solid var(--line); border-radius:999px; padding:5px 11px; font-size:12px; color:var(--muted); background:var(--panel); display:inline-flex; gap:6px; align-items:center; }
   .pill b { color:var(--ink); font-weight:600; }
   .dot { width:8px; height:8px; border-radius:50%; background:var(--muted); display:inline-block; } .dot.ok { background:var(--accent); } .dot.bad { background:var(--bad); }
-  main { display:grid; grid-template-columns: 1.05fr 1.7fr 1.05fr; gap:16px; padding:16px 22px; }
+  main { display:grid; grid-template-columns: 1fr 1.1fr 1.6fr; gap:16px; padding:16px 22px; }
   section.panel { background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:16px; display:flex; flex-direction:column; gap:12px; min-width:0; }
   .panel h2 { margin:0; font-size:15px; display:flex; align-items:center; gap:8px; }
   .panel h2 .n { font-family:var(--mono); color:var(--accent); font-size:12px; border:1px solid var(--line); border-radius:6px; padding:2px 6px; }
@@ -27,9 +27,9 @@
   button { background:var(--accent); color:#06261a; border:0; border-radius:9px; padding:9px 13px; font-weight:700; cursor:pointer; font-size:13px; }
   button.ghost { background:transparent; color:var(--ink); border:1px solid var(--line); font-weight:600; }
   button:disabled { opacity:.5; cursor:wait; }
-  .btns { display:flex; flex-wrap:wrap; gap:8px; }
-  table.kv { width:100%; border-collapse:collapse; font-size:12.5px; } .kv td { padding:5px 6px; border-top:1px solid var(--line); vertical-align:top; word-break:break-all; } .kv td:first-child { color:var(--muted); font-family:var(--mono); white-space:nowrap; width:38%; }
-  .feed { display:flex; flex-direction:column; gap:8px; max-height:52vh; overflow:auto; padding-right:4px; }
+  .btns { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+  table.kv { width:100%; border-collapse:collapse; font-size:12.5px; } .kv td { padding:5px 6px; border-top:1px solid var(--line); vertical-align:top; word-break:break-all; } .kv td:first-child { color:var(--muted); font-family:var(--mono); white-space:nowrap; width:40%; }
+  .feed { display:flex; flex-direction:column; gap:8px; max-height:56vh; overflow:auto; padding-right:4px; }
   .card { background:var(--panel2); border:1px solid var(--line); border-radius:10px; padding:10px 12px; font-size:13px; }
   .card.tool { border-left:3px solid var(--blue); } .card.pay { border-left:3px solid var(--accent); } .card.quote { border-left:3px solid var(--warn); } .card.err { border-left:3px solid var(--bad); }
   .card .t { color:var(--muted); font-family:var(--mono); font-size:11.5px; margin-bottom:3px; }
@@ -38,13 +38,14 @@
   .verdict.show { display:grid; grid-template-columns: 150px 1fr; gap:14px; align-items:start; }
   .gauge { width:150px; height:150px; }
   .md h2, .md h3 { font-size:14px; margin:10px 0 4px; } .md ul { margin:4px 0 8px 18px; padding:0; } .md li { margin:3px 0; line-height:1.45; } .md p { margin:6px 0; line-height:1.45; } .md code { background:#070b16; padding:1px 4px; border-radius:4px; }
-  .meter { height:8px; background:#070b16; border:1px solid var(--line); border-radius:999px; overflow:hidden; width:160px; } .meter i { display:block; height:100%; background:var(--accent); width:0%; transition:width .4s; }
-  .rows { display:flex; flex-direction:column; gap:6px; } .row { display:grid; grid-template-columns: 110px 1fr auto; gap:10px; font-size:12.5px; padding:6px 8px; background:var(--panel2); border:1px solid var(--line); border-radius:8px; align-items:center; } .row .ms { color:var(--muted); font-family:var(--mono); }
+  .meter { height:8px; background:#070b16; border:1px solid var(--line); border-radius:999px; overflow:hidden; width:140px; } .meter i { display:block; height:100%; background:var(--accent); width:0%; transition:width .4s; }
+  .rows { display:flex; flex-direction:column; gap:6px; } .row { display:grid; grid-template-columns: 120px 1fr auto; gap:10px; font-size:12.5px; padding:6px 8px; background:var(--panel2); border:1px solid var(--line); border-radius:8px; align-items:center; } .row .ms { color:var(--muted); font-family:var(--mono); }
   details { font-size:12px; } summary { cursor:pointer; color:var(--muted); } pre { background:#070b16; border:1px solid var(--line); border-radius:8px; padding:8px; max-height:220px; overflow:auto; font-size:11.5px; margin:6px 0 0; white-space:pre-wrap; word-break:break-all; }
   .wide { grid-column: 1 / -1; }
   .ok { color:var(--accent); } .bad { color:var(--bad); } .warn { color:var(--warn); } .muted { color:var(--muted); }
   .big { font-size:26px; font-weight:800; font-family:var(--mono); }
   footer { padding:10px 22px 24px; color:var(--muted); font-size:12px; }
+  @media (max-width: 1200px) { main { grid-template-columns: 1fr 1fr; } .panel.agent { grid-column: 1 / -1; } }
 </style>
 </head>
 <body>
@@ -74,19 +75,6 @@
     <div id="eacOut" class="rows"></div>
   </section>
 
-  <!-- 3 · Agent -->
-  <section class="panel">
-    <h2><span class="n">3</span> Ask the agent</h2>
-    <div class="hint">LLM (<span id="modelTxt">…</span>) with a Hedera wallet and a hard budget. It discovers, reads prices, and buys only the data it needs. Every payment and the final verdict are anchored on HCS.</div>
-    <textarea id="question">Is the WETH/USDC pool on Uniswap v3 being drained right now? Should an LP exit?</textarea>
-    <div class="btns"><button id="btnRun">Run agent</button><button class="ghost" id="btnClear">Clear</button><span class="hint" id="runStatus"></span></div>
-    <div class="verdict" id="verdict">
-      <svg class="gauge" viewBox="0 0 120 120" id="gauge"></svg>
-      <div><div class="md" id="verdictMd"></div><div id="verdictPays" class="hint"></div></div>
-    </div>
-    <div class="feed" id="feed"></div>
-  </section>
-
   <!-- 2 · Pay per call -->
   <section class="panel">
     <h2><span class="n">2</span> Pay per call · x402 on Hedera</h2>
@@ -97,7 +85,20 @@
       <button class="ghost pay" data-path="/v1/protocol-health?protocol=aave-v3">Aave v3 health</button>
       <button class="ghost" id="btnWire">Whale wire · 15 s window</button>
     </div>
-    <div id="payOut" class="feed" style="max-height:60vh"></div>
+    <div id="payOut" class="feed" style="max-height:62vh"></div>
+  </section>
+
+  <!-- 3 · Agent -->
+  <section class="panel agent">
+    <h2><span class="n">3</span> Ask the agent</h2>
+    <div class="hint">LLM (<span id="modelTxt">…</span>) with a Hedera wallet and a hard budget. It discovers, reads prices, and buys only the data it needs. Every payment and the final verdict are anchored on HCS.</div>
+    <textarea id="question">Is the WETH/USDC pool on Uniswap v3 being drained right now? Should an LP exit?</textarea>
+    <div class="btns"><button id="btnRun">Run agent</button><button class="ghost" id="btnClear">Clear</button><span class="hint" id="runStatus"></span></div>
+    <div class="verdict" id="verdict">
+      <svg class="gauge" viewBox="0 0 120 120" id="gauge"></svg>
+      <div><div class="md" id="verdictMd"></div><div id="verdictPays" class="hint"></div></div>
+    </div>
+    <div class="feed" id="feed"></div>
   </section>
 
   <!-- 4 · The Graph -->
@@ -115,6 +116,7 @@ const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const money = (n) => "$" + Math.round(Number(n || 0)).toLocaleString("en-US");
 const short = (s, n = 10) => (s && s.length > 2 * n + 2 ? s.slice(0, n) + "…" + s.slice(-n) : s);
+const RECORD_ORDER = ["agent-endpoint[x402]", "x402.network", "x402.payTo", "x402.assets", "x402.pricing", "x402.catalog", "hcs.audit", "hedera.account", "erc8004.registration", "agent-endpoint[web]", "agent-context"];
 let CTX = null;
 
 // ── tiny markdown (headings, bullets, bold, code, links) ──
@@ -124,7 +126,7 @@ function md(src) {
     .replace(/\[([^\]]+)\]\((https?:[^)]+)\)/g, '<a href="$2" target="_blank">$1</a>')
     .replace(/`([^`]+)`/g, "<code>$1</code>")
     .replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>")
-    .replace(/(https:\/\/hashscan\.io\/[^\s<]+|https:\/\/etherscan\.io\/[^\s<]+)/g, '<a href="$1" target="_blank">$1</a>');
+    .replace(/(^|[^"])(https:\/\/(?:hashscan\.io|etherscan\.io)\/[^\s<]+)/g, '$1<a href="$2" target="_blank">$2</a>');
   for (const raw of lines) {
     const l = raw.trimEnd();
     const li = /^\s*[-*]\s+(.*)$/.exec(l);
@@ -189,7 +191,8 @@ async function loadContext() {
   renderRecords(CTX.ens.records, null);
 }
 function renderRecords(records, hier) {
-  const rows = Object.entries(records).map(([k, v]) => `<tr><td>${esc(k)}</td><td>${/^https?:/.test(v) ? `<a href="${esc(v)}" target="_blank">${esc(v)}</a>` : esc(v)}</td></tr>`).join("");
+  const keys = Object.keys(records).sort((a, b) => (RECORD_ORDER.indexOf(a) + 1 || 99) - (RECORD_ORDER.indexOf(b) + 1 || 99));
+  const rows = keys.map((k) => { const v = records[k]; return `<tr><td>${esc(k)}</td><td>${/^https?:/.test(v) ? `<a href="${esc(v)}" target="_blank">${esc(v)}</a>` : esc(v)}</td></tr>`; }).join("");
   $("#ensRecords").innerHTML = rows || `<tr><td colspan="2" class="bad">no records</td></tr>`;
   if (hier) {
     $("#ensHier").innerHTML = `<b>Registry hierarchy</b><br/>ETHRegistry.getSubregistry("${CTX.ens.name.split(".")[1]}") → <span class="mono">${short(hier.subregistry, 8)}</span> (our PermissionedRegistry)<br/>
@@ -255,7 +258,7 @@ $("#btnWire").onclick = async (e) => {
     payment: (x) => { lines.push(payLine(x.payment)); render(); },
     "wire:window": (w) => { lines.push(`window open · mode <b>${esc(w.mode)}</b> · ≥ ${money(w.minUsd)} · closes ${w.expiresAt.slice(11, 19)}Z`); render(); },
     "wire:whale": (w) => { lines.push(`🐋 <b>${money(w.amountUsd)}</b> ${esc(w.kind)} ${esc(w.protocol)} — ${esc(w.detail)} <a href="${w.explorer}" target="_blank">tx</a>`); render(); },
-    "wire:heartbeat": () => { beats++; lines[lines.length - (lines[lines.length - 1]?.startsWith("♥") ? 1 : 0)] = `♥ streaming… ${beats * 5}s`; render(); },
+    "wire:heartbeat": () => { beats++; const last = lines[lines.length - 1] || ""; if (last.startsWith("♥")) lines[lines.length - 1] = `♥ streaming… ${beats * 5}s`; else lines.push(`♥ streaming… ${beats * 5}s`); render(); },
     "wire:window_closed": (w) => { lines.push(`<span class="warn">window closed</span> — ${esc(w.reason)}; re-request to extend (that is the streamed micropayment)`); render(); },
     error: (x) => { lines.push(`<span class="bad">${esc(x.message)}</span>`); render(); },
   });
@@ -279,12 +282,12 @@ $("#btnRun").onclick = async () => {
     tool_result: (e) => {
       const c = pending[e.id]; if (!c) return; const d = c.querySelector("div.muted:last-child");
       let extra = "";
-      if (e.data && e.name === "pool_risk" && e.data.score !== undefined) { lastRisk = e.data; extra = `<b>${e.data.pool.name}</b> → score <b>${e.data.score}</b> (${e.data.level})`; }
+      if (e.data && e.name === "pool_risk" && e.data.score !== undefined) { lastRisk = e.data; extra = `<b>${esc(e.data.pool.name)}</b> → score <b>${e.data.score}</b> (${e.data.level})`; }
       else if (e.data && e.name === "scan_whales" && e.data.events) extra = `${e.data.events.length} whale events across ${e.data.protocols.join(", ")}`;
       else if (e.data && e.name === "discover_services" && Array.isArray(e.data)) extra = `found ${e.data.map((s) => s.name).join(", ")}`;
       else if (e.name === "watch_whale_wire" && e.data) extra = `${e.data.observed} whale events in the window`;
       else extra = esc(e.preview.slice(0, 160));
-      d.innerHTML = `${extra} <span class="muted">· ${(e.ms / 1000).toFixed(1)} s</span>`; d.className = "";
+      if (d) { d.innerHTML = `${extra} <span class="muted">· ${(e.ms / 1000).toFixed(1)} s</span>`; d.className = ""; }
     },
     log: (e) => { if (e.line.startsWith("  🐋")) appendTo("#feed", card("", "whale wire", esc(e.line.trim()))); },
     final: (e) => {
