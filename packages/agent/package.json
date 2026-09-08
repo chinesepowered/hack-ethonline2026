@@ -5,15 +5,21 @@
   "type": "module",
   "scripts": {
     "start": "tsx src/index.ts",
+    "ui": "tsx src/web.ts",
     "curl": "tsx scripts/curl.ts"
   },
   "dependencies": {
+    "@rugradar/ens": "workspace:*",
     "@rugradar/shared": "workspace:*",
     "@x402/core": "2.25.0",
     "@x402/fetch": "2.25.0",
     "@x402/hedera": "2.25.0",
+    "express": "5.2.1",
     "openai": "7.10.0",
     "viem": "2.56.3",
     "zod": "4.5.4"
+  },
+  "devDependencies": {
+    "@types/express": "5.0.6"
   }
 }

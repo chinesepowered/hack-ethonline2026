@@ -11,6 +11,7 @@
   "scripts": {
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "service": "pnpm --filter @rugradar/service dev",
+    "ui": "pnpm --filter @rugradar/agent ui",
     "tunnel": "cloudflared tunnel --url http://localhost:4021",
     "render:deploy": "node scripts/render-deploy.mjs",
     "agent": "pnpm --filter @rugradar/agent start",

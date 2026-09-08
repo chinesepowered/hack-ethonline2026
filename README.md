@@ -12,6 +12,21 @@ Built from scratch at ETHOnline 2026 for three bounties:
 | **The Graph — Composable / Standardized Graph Products** | Every endpoint runs **one query string across many protocols** using the **Messari Standardized Subgraphs** (`dex-amm` schema: Uniswap v3, Uniswap v2, SushiSwap, Curve; `lending` schema: Aave v3, Compound v3, Spark). The live whale wire **composes Substreams** (`ethereum-common` package, `filtered_events`) **with a standardized subgraph** for pricing. All data is live from The Graph Network gateway; nothing is mocked. |
 | **ENS — Best Use of ENSv2 (Sepolia)** | The namespace `rugradar.eth` owns its **own PermissionedRegistry** and **own PermissionedResolver** (deployed through the VerifiableFactory). Services are **expiring, non-transferable, revocable subnames**; their x402 endpoint, price list, pay-to account and audit topic are **text records** (ENSIP-26 `agent-endpoint[x402]` + `agent-context`). **Enhanced Access Control** delegates exactly one text key (`x402.pricing`) to the service's own key. The agent discovers services by **walking the registry** and resolving through the **Universal Resolver**; nothing about the paid API is hard-coded in the agent. Agents get their own identity subnames too. |
 
+## Demo UI — everything from one tab
+
+```bash
+pnpm ui        # → http://localhost:3001
+```
+
+One page, four panels, every button does the real thing and streams what happens over Server-Sent Events:
+
+1. **Discover** — resolves `api.rugradar.eth` live through the ENSv2 Universal Resolver, shows the records and the registry hierarchy (`ETHRegistry → our registry → our resolver`, expiry, non-transferable), and a **Prove Enhanced Access Control** button where the service's own key edits `x402.pricing` and is refused on any other record.
+2. **Pay per call** — one-click paid requests: the `402` quote (HBAR and USDC options, pay-to, fee payer), the Hedera settlement id linked to HashScan, then the result summarized (risk score, whale list, lending stress). Plus a **Whale wire** button that pays for one 15-second SSE window.
+3. **Ask the agent** — the LLM run as a live feed: tool calls, quotes, payments, budget meter, then the verdict with a risk gauge, evidence, the payments list, and the HCS-anchored decision.
+4. **One query, every protocol** — the same standardized query fanned out to all seven protocols with timings.
+
+`demo.md` is the recording runbook; `slides.html` is the four-slide pitch (arrow keys).
+
 ## A real run (Hedera testnet + ENSv2 Sepolia + The Graph Network)
 
 ```
@@ -35,7 +50,7 @@ many addresses, large swaps run both ways. Recommended action: no exit needed.
 
 ```mermaid
 flowchart LR
-  subgraph Agent["packages/agent · LLM agent (Qwen 3.8) with a Hedera wallet"]
+  subgraph Agent["packages/agent · LLM agent (Qwen 3.8) with a Hedera wallet + demo UI"]
     A1["discover_services"] --> A2["read_catalog"]
     A2 --> A3["pool_risk · scan_whales · protocol_health · watch_whale_wire"]
     A3 --> A4["budget guard + HCS spend ledger"]
@@ -46,7 +61,7 @@ flowchart LR
     E2 --> E3[("our PermissionedResolver<br/>agent-endpoint, x402.*, hcs.* records")]
   end
 
-  subgraph Service["packages/service · x402-gated API on Hedera"]
+  subgraph Service["packages/service · x402-gated API on Hedera (Render)"]
     S1["GET /v1/whales"]
     S2["GET /v1/pool-risk"]
     S3["GET /v1/protocol-health"]
@@ -148,15 +163,14 @@ pnpm ens:service-update api "<new pricing string>"   # EAC demo: the service key
 # 4. pay for one call without the LLM ("curl with a wallet")
 pnpm demo:curl "/v1/pool-risk?tokens=WETH,USDC"
 
-# 5. the agent
+# 5. the agent — CLI or the demo UI
 pnpm agent "Is the WETH/USDC pool on Uniswap v3 being drained right now? Should an LP exit?"
+pnpm ui                      # http://localhost:3001
 ```
 
-For a local run before ENS is set up, `SERVICE_URL_OVERRIDE=http://localhost:4021 pnpm demo:curl "/v1/whales?protocols=curve"` skips discovery.
+For a local run before ENS is set up, `SERVICE_URL_OVERRIDE=http://localhost:4021 pnpm demo:curl "/v1/whales?protocols=curve"` skips discovery (the UI honours the same variable).
 
-**Public URL.** The service is a long-lived process (facilitator sync at boot, open Substreams stream, SSE windows up to 120 s), so it does not fit serverless hosting. It runs on Render's free tier at `https://rugradar-vibj.onrender.com` (sleeps after 15 min idle; hit `/health` to wake it). For a quick alternative, `pnpm tunnel` (cloudflared) prints a `https://*.trycloudflare.com` URL; set it as `SERVICE_URL`, restart the service, and republish the records with `pnpm ens:register api --url <url>`.
-
-See `demo.md` for the recording runbook and `slides.html` for the four-slide pitch.
+**Public URL.** The service is a long-lived process (facilitator sync at boot, open Substreams stream, SSE windows up to 120 s), so it does not fit serverless hosting. It runs on Render's free tier at `https://rugradar-vibj.onrender.com` (sleeps after 15 min idle; hit `/health` to wake it). Pushes do not auto-deploy there; run `pnpm render:deploy`. For a quick alternative, `pnpm tunnel` (cloudflared) prints a `https://*.trycloudflare.com` URL; set it as `SERVICE_URL`, restart the service, and republish the records with `pnpm ens:register api --url <url>`.
 
 ## The Graph: what the standard bought us
 
@@ -173,8 +187,8 @@ See `demo.md` for the recording runbook and `slides.html` for the four-slide pit
 | **.eth registration** on the ENSv2 ETH Registrar (MockUSDC, commit → 60 s → reveal) | same |
 | **Expiring** (30 d), **non-transferable** (no `ROLE_CAN_TRANSFER_ADMIN`), **revocable** (`unregister`) service subnames | `register-service.ts`, `revoke-service.ts`, `shared/src/ens.ts` |
 | **ENSIP-26** agent text records (`agent-context`, `agent-endpoint[x402]`) + namespaced `x402.*` / `hcs.*` / `erc8004.*` keys | `register-service.ts` |
-| **Enhanced Access Control** delegation of exactly one text key to the service's key (`authorizeTextRoles`), proven by `service-update.ts` | `register-service.ts`, `service-update.ts` |
-| **Universal Resolver** resolution and registry walking in the consumer | `packages/agent/src/discovery.ts`, `packages/ens/src/resolve.ts` |
+| **Enhanced Access Control** delegation of exactly one text key to the service's key (`authorizeTextRoles`), proven live by `packages/ens/src/lib/eac.ts` (CLI and UI button) | `register-service.ts`, `lib/eac.ts` |
+| **Universal Resolver** resolution and registry walking in the consumer | `packages/agent/src/discovery.ts`, `packages/agent/src/web.ts` |
 | **Agents as namespaces**: the agent has its own subname (`scout.rugradar.eth`) with its Hedera account and spend-ledger topic | `pnpm ens:register scout --agent` |
 
 ## Hedera: payment flow details
@@ -207,7 +221,8 @@ See `demo.md` for the recording runbook and `slides.html` for the four-slide pit
 ```
 packages/shared    protocols registry, Graph gateway client + queries, risk scoring, ENSv2 constants/ABIs, HCS helpers
 packages/service   Express + @x402/express on Hedera (Blocky402), metered routes, SSE stream, Substreams wire, ERC-8004 file
-packages/agent     tool-calling LLM agent (OpenAI-compatible API, Qwen 3.8), ENS discovery, paying fetch with budget guard, HCS spend ledger, curl demo
-packages/ens       deploy-namespace, register-service, service-update (EAC demo), revoke-service, resolve, list (viem, Sepolia)
+packages/agent     agent loop (OpenAI-compatible API, Qwen 3.8), ENS discovery, paying fetch with budget guard, HCS spend ledger,
+                   CLI (src/index.ts), demo UI server + page (src/web.ts, public/index.html), curl demo
+packages/ens       deploy-namespace, register-service, lib/eac (EAC proof), revoke-service, resolve, list (viem, Sepolia)
 demo.md            recording runbook · slides.html: four-slide pitch · hackathon.md: bounty analysis
 ```

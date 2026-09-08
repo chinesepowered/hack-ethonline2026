@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "exports": {
+    "./eac": "./src/lib/eac.ts"
+  },
   "scripts": {
     "deploy-namespace": "tsx src/deploy-namespace.ts",
     "register-service": "tsx src/register-service.ts",

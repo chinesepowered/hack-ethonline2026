@@ -1,77 +1,77 @@
-# Rug Radar — demo runbook
+# Rug Radar — demo runbook (one tab)
 
-Target: a 3–4 minute screen recording. Everything below is real (Hedera testnet, ENSv2 Sepolia, The Graph Network). Rehearse once; the paid calls cost fractions of an HBAR.
+Target: a 3–4 minute screen recording from **one browser tab**: the demo UI at `http://localhost:3001`. Every button on it does the real thing (Hedera testnet, ENSv2 Sepolia, The Graph Network). HashScan / ENS links open in new tabs when you want proof on screen.
 
-## 0. Before you hit record (10 min)
+## 0. Before you hit record (5 min)
 
-1. **Service is up and public.** Either the Render deployment (`https://rugradar-vibj.onrender.com`) or a local run + tunnel:
-   ```bash
-   pnpm service          # terminal A
-   pnpm tunnel           # terminal B → copy the https://*.trycloudflare.com URL
-   ```
-   Render's free tier sleeps after 15 min idle and takes ~60 s to wake, so **open `<SERVICE_URL>/health` in a browser first** and wait for JSON. Pushes to `main` do **not** auto-deploy (no GitHub app connected); after changing service code run `pnpm render:deploy` (~4 min).
-2. **ENS records point at that URL.** Only needed if the URL changed:
-   ```bash
-   pnpm ens:register api --url <SERVICE_URL>      # ~2 min, a dozen Sepolia txs
-   pnpm ens:resolve api.rugradar.eth              # confirm agent-endpoint[x402]
-   ```
-3. **Wallets funded.** Agent `0.0.10372230` needs a few HBAR (check https://hashscan.io/testnet/account/0.0.10372230). Sepolia admin `0x6Bd0…78B2` needs a little ETH only if you re-register.
-4. **Browser tabs ready** (in this order):
-   - https://sepolia.app.ens.domains/api.rugradar.eth
-   - https://hashscan.io/testnet/topic/0.0.10372243 (service settlement audit)
-   - https://hashscan.io/testnet/topic/0.0.10372244 (agent spend ledger)
-   - `<SERVICE_URL>/v1/catalog`
-5. **Terminal**: big font, dark theme, repo root, `.env` filled. Run `pnpm graph:smoke` once so the gateway is warm, then **one off-camera `pnpm demo:curl "/v1/pool-risk?tokens=WETH,USDC"`**: the first token-pair lookup fans out to every DEX and The Graph gateway can take 5–60 s; the service caches the pick, so the on-camera call is ~10 s.
-
-## 1. Script (what to say, what to run)
-
-### Slide 1 — Problem (0:00–0:20)
-"LPs find out about a drain after the fact. An agent can watch pools 24/7, but it needs data it can *buy* per call — no API keys, no subscriptions. Rug Radar is that: an x402-metered intelligence service on Hedera, computed from The Graph's standardized subgraphs, discoverable through ENSv2."
-
-### Discovery — ENSv2 (0:20–0:55)
 ```bash
-pnpm ens:resolve api.rugradar.eth
+pnpm ui                      # → http://localhost:3001   (takes ~1 min to boot)
 ```
-Point at: `agent-endpoint[x402]` (the URL), `x402.pricing`, `hcs.audit`; then the **registry hierarchy** lines: `ETHRegistry.getSubregistry("rugradar") → our registry`, `getResolver("api") → our resolver`, `expires …`, `transferable by owner: false`.
 
-Say: "`rugradar.eth` runs its own ENSv2 registry and resolver. Services are expiring, non-transferable subnames. Nothing about the API is hard-coded in the agent — it all comes from these records."
+Then, in the page:
 
-Optional 15 s flex (pre-run it, just show the output): `pnpm ens:service-update api "…"` — the service's own key can edit **only** `x402.pricing`; it is refused on `agent-context`. That's Enhanced Access Control.
+1. Wait for the **service dot** in the header to turn green. The service runs on Render's free tier and sleeps after 15 min idle; the page re-checks every 15 s while it wakes (~1 min). If it stays red, open `https://rugradar-vibj.onrender.com/health` in another tab.
+2. Click **Pool risk · WETH/USDC** once off-camera. The first token-pair lookup fans out to every DEX (5–60 s depending on The Graph gateway); the service caches the pick so the on-camera call is ~10 s.
+3. Click **Clear** under the agent, and reload the page so the pay panel is empty.
 
-### Pay — Hedera x402 (0:55–1:55)
-```bash
-pnpm demo:curl "/v1/pool-risk?tokens=WETH,USDC"
-```
-Narrate the lines as they appear: "ENS resolved the endpoint → GET → **402** → the agent signs a 0.03 HBAR transfer → Blocky402 verifies and settles → 200 with the risk score → settlement id." Click the HashScan link. Switch to the **settlement audit topic** tab and show the newest `x402.settled` message.
+Wallet check: the agent wallet `0.0.10372230` needs a few HBAR (header pill links to HashScan). A full demo costs about 0.15 HBAR.
 
-Say: "Metered, not flat — this scan is priced per protocol, pool risk per lookback day, the stream per 15-second window. Settlement is on Hedera in about a second; the facilitator is the fee payer, so the agent only holds HBAR for the price. USDC is accepted too."
+If the service URL ever changes (new Render service, tunnel), republish the ENS records once: `pnpm ens:register api --url <url>`. The UI reads everything from ENS, so nothing else changes.
 
-### Reason — the agent (1:55–3:00)
-```bash
-pnpm agent "Is the WETH/USDC pool on Uniswap v3 being drained right now? Should an LP exit?"
-```
-While it runs (60–90 s): "It discovers through ENS, reads the catalog for prices, and spends against a hard budget it checks *before* signing. Every payment goes to its own HCS spend ledger."
+## 1. Script (what to click, what to say)
 
-When the verdict prints, read the first line aloud and point at the **Evidence** numbers (TVL change, withdrawals vs deposits, largest actor). Then the payments list. Open the **spend ledger** tab: show `x402.paid` records and the final `agent.decision` record.
+### Open — the problem (0:00–0:20)
+Page is loaded. Point at the header pills: service name, agent wallet, budget, HCS links.
 
-### Standards leverage — The Graph (3:00–3:30)
-```bash
-pnpm graph:smoke
-```
-"One query string. Four DEXes, three lenders, same schema — Messari's standardized subgraphs. The only thing that ever differed between schema versions is one field name." Show `packages/shared/src/graph.ts` line with `actorField`. Mention the live whale wire composes Substreams (`ethereum-common`) with the same subgraph for prices.
+> "LPs find out about a drain after the fact. An agent can watch pools 24/7 — but only if it can *buy* live data per call: no API keys, no subscriptions, and a receipt it can prove. Rug Radar is that service, and the agent that uses it."
+
+### 1 · Discover — ENSv2 (0:20–0:55)
+Click **Resolve live** in panel 1.
+
+> "The agent knows nothing about the API. It resolves `api.rugradar.eth` through the ENSv2 Universal Resolver. `rugradar.eth` runs its *own* registry and resolver — you can see the hierarchy: ETHRegistry → our PermissionedRegistry → our PermissionedResolver. The records carry the x402 endpoint, prices, the pay-to account, the audit topic. The name expires in 30 days and is non-transferable."
+
+Optional (+20 s, one Sepolia tx): click **Prove Enhanced Access Control**.
+> "The service's own key can edit exactly one record — its price — and is refused on everything else. That's Enhanced Access Control, delegated per key."
+
+### 2 · Pay — x402 on Hedera (0:55–1:50)
+Click **Pool risk · WETH/USDC** in panel 2. Read the lines as they appear:
+
+> "402 Payment Required, with a metered quote: 0.03 HBAR, or the same in USDC. The wallet signs a Hedera transfer. Blocky402 verifies it, the service computes, the facilitator settles — the facilitator even pays the network fee. 200: a drain score with the evidence behind it."
+
+Click the **settlement** link → HashScan tab: show the transfer. Click **HCS settlements** in the header: show the newest `x402.settled` record. Back to the tab.
+
+> "Prices scale with what you ask for — per protocol, per lookback day, per 15-second stream window."
+
+Optional (+20 s): **Whale wire · 15 s window** — "streamed micropayments: pay per window, re-request to extend."
+
+### 3 · Reason — the agent (1:50–3:00)
+Click **Run agent** (question is prefilled). While it runs (60–90 s) narrate the feed:
+
+> "It discovers the service through ENS, reads the catalog for prices, then decides what to buy. Every 402 goes through a hard budget check *before* signing. Each payment is mirrored to the agent's own HCS spend ledger."
+
+When the verdict appears: read the verdict line, point at the gauge and two or three evidence numbers, then the payments row.
+
+> "The verdict is anchored on HCS too — click through and you get the question, the model, the spend, and the settlement ids."
+
+Click **decision anchored on HCS ↗** if time allows.
+
+### 4 · Standards — The Graph (3:00–3:30)
+Click **Run the same query on 7 protocols**.
+
+> "One query string, seven protocols — Messari's standardized subgraphs on The Graph Network: four DEXes on the dex-amm schema, three lenders on the lending schema. The only thing that ever differed between schema versions is a single field name. The live whale wire composes the ethereum-common Substreams package with the same subgraphs for prices."
 
 ### Close (3:30–3:50)
-"Mainnet is a config flip: `HEDERA_NETWORK=mainnet`, mainnet facilitator, same code. ENSv2 records move with the name. This is the pattern for any paid data service an agent should be able to find and pay for on its own."
+> "Mainnet is a config flip — `HEDERA_NETWORK=mainnet` and the mainnet facilitator; the ENS name and records come along. This is the pattern for any data an agent should find and pay for on its own."
 
 ## 2. Fallbacks
 
 | If… | Do |
 |---|---|
-| Render is cold and the first call 402-loops | hit `/health` in the browser, wait 60 s, rerun |
-| gateway is slow (>30 s) | use `?protocols=curve` for the whale scan; pool-risk on `0x88e6…5640` is warm after one call |
-| Qwen rambles or skips tools | rerun with the question above verbatim; temperature is 0.2 |
-| Sepolia RPC flakes on resolve | set `SEPOLIA_RPC_URL` to another public endpoint in `.env` |
-| you only have local | `SERVICE_URL_OVERRIDE=http://localhost:4021 pnpm demo:curl …` skips ENS (don't do this on camera) |
+| service dot stays red | open `https://rugradar-vibj.onrender.com/health` in a tab, wait for JSON, reload the UI |
+| a paid call takes > 40 s | The Graph gateway is slow; say so, it will complete. Whales · 2 DEXes is the fastest button |
+| agent verdict is thin | rerun with the prefilled question; temperature is 0.2 |
+| Sepolia RPC flakes (records missing) | set `SEPOLIA_RPC_URL` in `.env` to another public endpoint, restart `pnpm ui` |
+| you need the terminal version | `pnpm demo:curl "/v1/pool-risk?tokens=WETH,USDC"` and `pnpm agent "…"` do the same things in text |
 
 ## 3. Pre-generated evidence (if something dies mid-take)
 
@@ -80,3 +80,4 @@ pnpm graph:smoke
 - A settled x402 payment: https://hashscan.io/testnet/transaction/0.0.7162784%401788663313.356227872
 - An anchored agent decision: https://hashscan.io/testnet/transaction/0.0.10372230%401788663436.746860424
 - Full agent transcript: README → "A real run"
+- Pitch deck for the intro/outro shots: open `slides.html` (arrow keys)

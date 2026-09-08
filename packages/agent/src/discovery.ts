@@ -21,22 +21,33 @@ export interface DiscoveredService {
 }
 
 export function sepoliaClient() {
-  return createPublicClient({ chain: sepolia, transport: http(env("SEPOLIA_RPC_URL", "https://ethereum-sepolia-rpc.publicnode.com")) });
+  return createPublicClient({
+    chain: sepolia,
+    transport: http(env("SEPOLIA_RPC_URL", "https://ethereum-sepolia-rpc.publicnode.com"), { retryCount: 3, retryDelay: 400, timeout: 20_000 }),
+    batch: { multicall: false },
+  });
 }
 
-export async function resolveRecords(name: string, keys: string[] = SERVICE_RECORD_KEYS): Promise<Record<string, string>> {
+/** Public RPCs rate-limit bursts; resolve a few keys at a time and retry each once. */
+export async function resolveRecords(name: string, keys: string[] = SERVICE_RECORD_KEYS, concurrency = 3): Promise<Record<string, string>> {
   const client = sepoliaClient();
   const records: Record<string, string> = {};
-  await Promise.all(
-    keys.map(async (key) => {
-      try {
-        const v = await client.getEnsText({ name: normalize(name), key, universalResolverAddress: ENSV2_SEPOLIA.universalResolver });
-        if (v) records[key] = v;
-      } catch {
-        /* unset record */
+  const queue = [...keys];
+  const one = async (key: string, attempt = 1): Promise<void> => {
+    try {
+      const v = await client.getEnsText({ name: normalize(name), key, universalResolverAddress: ENSV2_SEPOLIA.universalResolver });
+      if (v) records[key] = v;
+    } catch {
+      if (attempt < 3) {
+        await new Promise((r) => setTimeout(r, 300 * attempt));
+        return one(key, attempt + 1);
       }
-    }),
-  );
+    }
+  };
+  const workers = Array.from({ length: Math.min(concurrency, queue.length) }, async () => {
+    while (queue.length) await one(queue.shift()!);
+  });
+  await Promise.all(workers);
   return records;
 }
 
@@ -48,16 +59,20 @@ export async function discoverServices(): Promise<DiscoveredService[]> {
 
   if (deployment) {
     const client = sepoliaClient();
-    const logs = await client.getLogs({
-      address: deployment.userRegistry,
-      event: parseAbiItem(
-        "event LabelRegistered(uint256 indexed tokenId, bytes32 indexed labelHash, string label, address owner, uint64 expiry, address indexed sender)",
-      ),
-      fromBlock: BigInt(deployment.deployBlock || 0),
-      toBlock: "latest",
-    });
-    for (const log of logs) {
-      if (log.args.label) names.add(`${log.args.label}.${deployment.parentName}`);
+    try {
+      const logs = await client.getLogs({
+        address: deployment.userRegistry,
+        event: parseAbiItem(
+          "event LabelRegistered(uint256 indexed tokenId, bytes32 indexed labelHash, string label, address owner, uint64 expiry, address indexed sender)",
+        ),
+        fromBlock: BigInt(deployment.deployBlock || 0),
+        toBlock: "latest",
+      });
+      for (const log of logs) {
+        if (log.args.label) names.add(`${log.args.label}.${deployment.parentName}`);
+      }
+    } catch (err) {
+      console.warn("[ens] registry log scan failed, using pinned name only:", err instanceof Error ? err.message.split("\n")[0] : err);
     }
   }
 

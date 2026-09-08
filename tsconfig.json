@@ -13,7 +13,8 @@
     "allowImportingTsExtensions": true,
     "types": ["node"],
     "paths": {
-      "@rugradar/shared": ["./packages/shared/src/index.ts"]
+      "@rugradar/shared": ["./packages/shared/src/index.ts"],
+      "@rugradar/ens/eac": ["./packages/ens/src/lib/eac.ts"]
     }
   },
   "include": ["packages/*/src/**/*.ts", "packages/*/scripts/**/*.ts"]

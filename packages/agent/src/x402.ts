@@ -2,6 +2,7 @@
  * Paying fetch for the agent: wraps fetch with x402 (Hedera exact scheme),
  * enforces a hard HBAR budget *before* signing, and records every settled
  * payment (from the PAYMENT-RESPONSE header) to the agent's HCS spend ledger.
+ * Emits `quote` / `payment` events so a UI can show the 402 → pay → 200 flow live.
  */
 import { decodePaymentResponseHeader, wrapFetchWithPayment, x402Client } from "@x402/fetch";
 import { decodePaymentRequiredHeader } from "@x402/core/http";
@@ -21,14 +22,26 @@ export interface Payment {
   auditTx: string | null;
 }
 
+export interface Quote {
+  url: string;
+  hbar: number;
+  options: Array<{ asset: string; amount: string; network: string }>;
+  payTo: string | null;
+  feePayer: string | null;
+}
+
+export type PayEvent = { kind: "quote"; quote: Quote } | { kind: "payment"; payment: Payment } | { kind: "budget_exceeded"; message: string };
+
 export class BudgetExceeded extends Error {}
+
+type PaymentRequired402 = { accepts?: Array<{ asset?: string; amount?: string; network?: string; payTo?: string; extra?: { feePayer?: string } }>; error?: string };
 
 /** Human-readable reason for a 402 that survived a payment attempt (e.g. facilitator rejected the signature). */
 export function describe402(res: Response): string {
   const header = res.headers.get("PAYMENT-REQUIRED");
   if (!header) return "402 without PAYMENT-REQUIRED header";
   try {
-    const pr = decodePaymentRequiredHeader(header) as { error?: string; accepts?: Array<{ amount?: string; asset?: string; network?: string }> };
+    const pr = decodePaymentRequiredHeader(header) as PaymentRequired402;
     const quote = pr.accepts?.map((a) => `${a.amount} of ${a.asset} on ${a.network}`).join(" | ");
     return `${pr.error ?? "payment required"}${quote ? ` (quote: ${quote})` : ""}`;
   } catch {
@@ -36,9 +49,7 @@ export function describe402(res: Response): string {
   }
 }
 
-type PaymentRequired402 = { accepts?: Array<{ asset?: string; amount?: string; network?: string }> };
-
-export function createPayingFetch() {
+export function createPayingFetch(onEvent: (e: PayEvent) => void = () => {}) {
   const accountId = env("HEDERA_AGENT_ACCOUNT_ID");
   const key = PrivateKey.fromStringECDSA(env("HEDERA_AGENT_PRIVATE_KEY"));
   const network = caip2();
@@ -72,6 +83,7 @@ export function createPayingFetch() {
     const h = input instanceof Request ? input.headers : init?.headers ? new Headers(init.headers) : undefined;
     return !!h && (h.has("PAYMENT-SIGNATURE") || h.has("X-PAYMENT"));
   };
+  const urlOf = (input: RequestInfo | URL) => (input instanceof Request ? input.url : String(input));
 
   // Inner fetch: see the 402 first, enforce budget, then let x402 retry with a signed payment.
   const guardedFetch: typeof fetch = async (input, init) => {
@@ -83,10 +95,21 @@ export function createPayingFetch() {
         ? (decodePaymentRequiredHeader(header) as PaymentRequired402)
         : ((await res.clone().json().catch(() => ({}))) as PaymentRequired402);
       lastQuote = quoteFor(body);
+      const first = body.accepts?.[0];
+      onEvent({
+        kind: "quote",
+        quote: {
+          url: urlOf(input),
+          hbar: tinybarToHbar(lastQuote),
+          options: (body.accepts ?? []).map((a) => ({ asset: a.asset ?? "?", amount: a.amount ?? "?", network: a.network ?? "?" })),
+          payTo: first?.payTo ?? null,
+          feePayer: first?.extra?.feePayer ?? null,
+        },
+      });
       if (spentTinybar + lastQuote > budgetTinybar) {
-        throw new BudgetExceeded(
-          `quote ${tinybarToHbar(lastQuote)} HBAR would exceed budget (${tinybarToHbar(budgetTinybar)} HBAR, spent ${tinybarToHbar(spentTinybar)} HBAR)`,
-        );
+        const message = `quote ${tinybarToHbar(lastQuote)} HBAR would exceed budget (${tinybarToHbar(budgetTinybar)} HBAR, spent ${tinybarToHbar(spentTinybar)} HBAR)`;
+        onEvent({ kind: "budget_exceeded", message });
+        throw new BudgetExceeded(message);
       }
     }
     return res;
@@ -116,6 +139,8 @@ export function createPayingFetch() {
           hashscan: hashscanTx(settle.transaction),
           auditTx: null,
         };
+        payments.push(payment);
+        onEvent({ kind: "payment", payment });
         payment.auditTx = await audit.log({
           v: 1,
           kind: "x402.paid",
@@ -127,7 +152,6 @@ export function createPayingFetch() {
           asset: HBAR_ASSET,
           settlementTx: settle.transaction,
         });
-        payments.push(payment);
       } catch (err) {
         console.warn("[x402] could not decode PAYMENT-RESPONSE:", err instanceof Error ? err.message : err);
       }

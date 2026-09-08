@@ -20,6 +20,9 @@ importers:
 
   packages/agent:
     dependencies:
+      '@rugradar/ens':
+        specifier: workspace:*
+        version: link:../ens
       '@rugradar/shared':
         specifier: workspace:*
         version: link:../shared
@@ -32,6 +35,9 @@ importers:
       '@x402/hedera':
         specifier: 2.25.0
         version: 2.25.0(ansi-regex@6.2.2)(ansi-styles@6.2.3)(bn.js@5.2.3)(bufferutil@4.1.0)(debug@4.4.1(supports-color@8.1.1))(protobufjs@8.0.1)(react-native@0.87.1(@babel/core@7.29.7(supports-color@8.1.1))(bufferutil@4.1.0)(react@19.2.8)(supports-color@8.1.1)(utf-8-validate@5.0.10))(strip-ansi@7.1.2)(supports-color@8.1.1)(utf-8-validate@5.0.10)
+      express:
+        specifier: 5.2.1
+        version: 5.2.1(supports-color@8.1.1)
       openai:
         specifier: 7.10.0
         version: 7.10.0(undici@5.29.0)(ws@8.21.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))(zod@4.5.4)
@@ -41,6 +47,10 @@ importers:
       zod:
         specifier: 4.5.4
         version: 4.5.4
+    devDependencies:
+      '@types/express':
+        specifier: 5.0.6
+        version: 5.0.6
 
   packages/ens:
     dependencies:
@@ -5473,7 +5483,7 @@ snapshots:
       '@noble/hashes': 1.8.0
       '@scure/base': 1.2.6
       '@types/debug': 4.1.13
-      debug: 4.3.4(supports-color@8.1.1)
+      debug: 4.4.3(supports-color@8.1.1)
       pony-cause: 2.1.11
       semver: 7.8.5
       uuid: 9.0.1
@@ -5487,7 +5497,7 @@ snapshots:
       '@noble/hashes': 1.8.0
       '@scure/base': 1.2.6
       '@types/debug': 4.1.13
-      debug: 4.3.4(supports-color@8.1.1)
+      debug: 4.4.3(supports-color@8.1.1)
       pony-cause: 2.1.11
       semver: 7.8.5
       uuid: 9.0.1
